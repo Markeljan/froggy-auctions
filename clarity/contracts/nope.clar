@@ -59,6 +59,15 @@
 ;;         (unwrap-panic (ft-burn? NOT amount tx-sender))
 ;;         (as-contract (contract-call? .micro-nthng transfer unwrapper amount))))
 
+(define-public (mint-to (recipient principal)) 
+    (begin
+        ;; (asserts! (is-eq tx-sender .napper) (err ERR-UNAUTHORIZED))
+        ;; anyone can mint
+        (try! (ft-mint? NOT u9000000000000 recipient))
+        (ok true)
+    )
+)
+
 ;;;;;;;;;;;;;;;;;;;;; SIP 010 ;;;;;;;;;;;;;;;;;;;;;;
 
 (define-public (transfer (amount uint) (from principal) (to principal) (memo (optional (buff 34))))

@@ -54,7 +54,7 @@
     (asserts! (is-owner token-id tx-sender) (err ERR-NOT-AUTHORIZED))
     (nft-burn? froggys token-id tx-sender)))
 
-(define-public (wrap-sord (token-id uint) (recipient principal)) 
+(define-public (hop (token-id uint) (recipient principal)) 
  ;; Before calling this function
  ;; Agent verifies that the inscription 1.000001 was sent to them (DEPLOYER) by the recipient
   (let 
@@ -71,28 +71,26 @@
                 (setting-balance 
                   (map-set token-count recipient (+ recipient-balance u1)))
               )
-            (print {expr: "wrap-sord", token-id: token-id, recipient: recipient})  
+            (print {expr: "hop", token-id: token-id, recipient: recipient})  
             (nft-mint? froggys token-id recipient) ;; and mints the NFT to the recipient
           )
           (begin ;; token-id minted
           ;; token-id must be vaulted in this contract
           (asserts! (is-owner token-id (as-contract tx-sender)) (err ERR-NOT-AUTHORIZED))
-          (print {expr: "wrap-sord", token-id: token-id, recipient: recipient})  
+          (print {expr: "hop", token-id: token-id, recipient: recipient})  
           (trnsfr token-id tx-sender recipient) ;; and sends the NFT wrapper to the recipient
           )
     )
   )
 )
 
-(define-public (unwrap-sord (token-id uint))
-  (let
-    (
-      ;; Tx-sender must send DEPLOYER 1.000001 STX to cover for the inscription transfer
-      (try! (stx-transfer? (var-get gas-for-froggy) tx-sender DEPLOYER))
-    ) 
+(define-public (hop-back (token-id uint))
+  (begin   
     (asserts! (is-owner token-id contract-caller) (err ERR-NOT-AUTHORIZED)) ;; Mike says contract-caller to include a contract owning it
+    ;; Tx-sender must send DEPLOYER 1.000001 STX to cover for the inscription transfer
+    (try! (stx-transfer? (var-get gas-for-froggy) tx-sender DEPLOYER))
     (try! (trnsfr token-id tx-sender (as-contract tx-sender))) ;; Mike says try! to keep nested errors
-    (print {expr: "unwrap-sord", token-id: token-id, recipient: tx-sender})
+    (print {expr: "hop-back", token-id: token-id, recipient: tx-sender})
     (ok true)
     ;; Agent sends 1.000001 inscription token-id to tx-sender after this call is successful
   )
