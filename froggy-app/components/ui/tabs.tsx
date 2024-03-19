@@ -8,7 +8,7 @@ type Props = {
   className?: string;
 };
 
-export default function Tabs({ tabsArray, activeTab, setActiveTab, className, ...rest }: Props) {
+export function Tabs({ tabsArray, activeTab, setActiveTab, className, ...rest }: Props) {
   return (
     <div className={cn("flex flex-col w-[500px] rounded-md shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]", className)} {...rest}>
       {/* Tabs Row */}

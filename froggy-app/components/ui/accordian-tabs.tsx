@@ -1,30 +1,22 @@
-import { cn } from "@/lib/utils/cn";
-import { useEffect, useRef, useState } from "react";
+"use client";
+
+import { useState } from "react";
 import { FiPlus } from "react-icons/fi";
+import { cn } from "@/lib/utils/cn";
 
 type CombinedProps = {
-  tabsContentArray: { label: string; content: string }[];
+  tabsContentArray: { label: string; content: string | JSX.Element }[];
+  initialTab?: string;
   className?: string;
 };
 
-const AccordionTabs = ({ tabsContentArray, className, ...rest }: CombinedProps) => {
-  const [activeTab, setActiveTab] = useState<string | null>(null);
-  const [showContent, setShowContent] = useState(false);
-  const [contentHeight, setContentHeight] = useState<string | null>(null);
-  const contentRef = useRef<HTMLDivElement[]>([]);
-
-  useEffect(() => {
-    if (activeTab !== null) {
-      const index = tabsContentArray.findIndex((tab) => tab.label === activeTab);
-      if (contentRef.current[index]) {
-        setContentHeight(`${contentRef.current[index].scrollHeight}px`);
-      }
-    } else {
-      setContentHeight(null);
-    }
-  }, [activeTab, tabsContentArray]);
+export const AccordionTabs = ({ tabsContentArray, initialTab, className, ...rest }: CombinedProps) => {
+  const [activeTab, setActiveTab] = useState<string | null>(initialTab || null);
+  const [showContent, setShowContent] = useState(initialTab ? true : false);
+  const [shouldTransition, setShouldTransition] = useState(false);
 
   const toggleShowContent = () => {
+    setShouldTransition(true);
     if (!activeTab) {
       setActiveTab(tabsContentArray[0].label);
     }
@@ -33,7 +25,11 @@ const AccordionTabs = ({ tabsContentArray, className, ...rest }: CombinedProps) 
 
   return (
     <div
-      className={cn("flex flex-col w-[500px] rounded-md shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]", className)}
+      className={cn("flex flex-col w-full h-full", className, {
+        "rounded-md": activeTab,
+        "rounded-t-md": !showContent,
+        " shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]": activeTab && showContent,
+      })}
       {...rest}
     >
       <div className="flex w-full items-center justify-between bg-[#C4A1FF] font-bold rounded-t-md">
@@ -41,13 +37,14 @@ const AccordionTabs = ({ tabsContentArray, className, ...rest }: CombinedProps) 
           <button
             key={index}
             onClick={() => {
+              showContent ? setShouldTransition(false) : setShouldTransition(true);
               setActiveTab(label);
-              setShowContent(true);
+              !showContent && setShowContent(true);
             }}
             style={{
               backgroundColor: activeTab === label && showContent ? "#a36ec4" : "#C4A1FF",
             }}
-            className="cursor-pointer flex-1 border-2 border-black -m-[2px] px-6 py-3 text-center font-bold transition-colors first:rounded-tl-md"
+            className="flex cursor-pointer flex-1 border-2 border-black -m-[2px] max-sm:px-2 px-6 py-3 text-center font-bold transition-colors first:rounded-tl-md"
           >
             {label}
           </button>
@@ -67,27 +64,27 @@ const AccordionTabs = ({ tabsContentArray, className, ...rest }: CombinedProps) 
         </button>
       </div>
 
-      {/* Active Tab Content */}
-
       {tabsContentArray.map(({ label, content }, index) => (
         <div
           key={index}
-          ref={(el) => (contentRef.current[index] = el as HTMLDivElement) || null}
-          style={{
-            height: activeTab === label && showContent ? `${contentHeight}` : "0",
-            border: activeTab === label && showContent ? "solid 2px" : "0px",
-            borderTop: 0,
-          }}
           className={cn(
-            "overflow-hidden border-2 border-t-0 border-black rounded-b-[5px] -ml-[2px] bg-white font-bold transition-[height] ease-in-out",
-            {}
+            "overflow-y-auto no-scrollbar border-2 border-t-0 border-black rounded-b-[5px] -ml-[2px] bg-white font-bold",
+            {
+              "transition-[height] ease-in-out": shouldTransition,
+              "max-sm:h-[390px] sm:h-[600px] border-2 border-black": activeTab === label && showContent,
+              "h-0 border-none": activeTab !== label || !showContent,
+            }
           )}
         >
-          <div className="py-10 px-20">{content}</div>
+          <div
+            className={cn("py-8 px-6", {
+              "max-sm:h-[390px] sm:h-[590px]": activeTab === label && showContent,
+            })}
+          >
+            {content}
+          </div>
         </div>
       ))}
     </div>
   );
 };
-
-export default AccordionTabs;

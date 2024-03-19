@@ -1,44 +1,50 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { AppConfig, showConnect, UserSession } from "@stacks/connect";
-import Button from "./ui/button";
+import toast from "react-hot-toast";
+import { useConnect } from "@stacks/connect-react";
+import { useUserSession } from "@/app/providers";
+import { Container } from "@/components/ui/container";
+import { Button } from "@/components/ui/button";
+import { useIsClient } from "@/lib/hooks/use-is-client";
+import { cn } from "@/lib/utils/cn";
 
-const appConfig = new AppConfig(["store_write", "publish_data"]);
+export const ConnectWallet = ({ className, ...rest }: { className?: string }) => {
+  const isClient = useIsClient();
+  const { userSession, setUserSession, userData } = useUserSession();
+  const { isSignedIn, userAddress, shortUserAddress } = userData;
+  const { doOpenAuth } = useConnect();
 
-export const userSession = new UserSession({ appConfig });
-
-function authenticate() {
-  showConnect({
-    appDetails: {
-      name: "Froggy Auctions",
-      icon: window.location.origin + "/logo512.png",
-    },
-    redirectTo: "/",
-    onFinish: () => {
-      window.location.reload();
-    },
-    userSession,
-  });
-}
-
-function disconnect() {
-  userSession.signUserOut("/");
-}
-
-export const ConnectWallet = () => {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-
-  if (mounted && userSession.isUserSignedIn()) {
-    return (
-      <div className="Container">
-        <Button onClick={disconnect}>Disconnect Wallet</Button>
-        <p>mainnet: {userSession.loadUserData().profile.stxAddress.mainnet}</p>
-        <p>testnet: {userSession.loadUserData().profile.stxAddress.testnet}</p>
-      </div>
-    );
+  function handleClickCopyToClipboard() {
+    if (!userAddress) return;
+    navigator.clipboard.writeText(userAddress);
+    toast("Copied to clipboard", { icon: "📋" });
   }
 
-  return <Button onClick={authenticate}>Connect Wallet</Button>;
+  return (
+    <Container className={cn("flex p-4 space-x-2", className)} {...rest}>
+      {isClient && isSignedIn ? (
+        <>
+          <Button classname="rounded-full px-4" onClick={handleClickCopyToClipboard}>
+            {shortUserAddress}
+          </Button>
+          <Button
+            onClick={() => {
+              userSession?.signUserOut();
+              setUserSession(undefined);
+            }}
+          >
+            Disconnect
+          </Button>
+        </>
+      ) : (
+        <Button
+          onClick={() => {
+            doOpenAuth(false);
+          }}
+        >
+          Connect Wallet
+        </Button>
+      )}
+    </Container>
+  );
 };

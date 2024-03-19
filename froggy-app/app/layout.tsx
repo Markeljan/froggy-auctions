@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Archivo } from "next/font/google";
 import "@/app/globals.css";
-import { WalletProvider } from "@/components/wallet-provider";
+import { QueryProvider } from "@/components/query-provider";
+import { Toaster } from "react-hot-toast";
+import { UserSessionProvider } from "@/app/providers";
 
 const archivo = Archivo({ subsets: ["latin"] });
 
@@ -18,7 +20,21 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={archivo.className}>
-        <WalletProvider>{children}</WalletProvider>
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              border: "2px solid #000",
+              borderRadius: "6px",
+              fontWeight: "bold",
+              boxShadow: "4px 4px 0px 0px rgba(0, 0, 0, 1)",
+              backgroundColor: "#C4A1FF",
+            },
+          }}
+        />
+        <QueryProvider>
+          <UserSessionProvider>{children}</UserSessionProvider>
+        </QueryProvider>
       </body>
     </html>
   );

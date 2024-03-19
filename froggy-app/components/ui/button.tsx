@@ -6,7 +6,7 @@ type Props = {
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
-export default function Button({ classname, children, onClick, ...rest }: Props) {
+export function Button({ classname, children, onClick, ...rest }: Props) {
   return (
     <button
       role="button"

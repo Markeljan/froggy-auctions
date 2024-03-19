@@ -1,33 +1,32 @@
-"use client";
-
-import { ContractCallVote } from "@/components/contract-call-vote";
 import { ConnectWallet } from "@/components/connect-wallet";
 import { BoxesCore } from "@/components/ui/boxes-core";
-import Container from "@/components/ui/container";
-import AccordionTabs from "@/components/ui/accordian-tabs";
-import { useState } from "react";
-import Tabs from "@/components/ui/tabs";
-import Accordion from "@/components/ui/accordian";
+import { AccordionTabs } from "@/components/ui/accordian-tabs";
+import { Hop } from "@/components/hop";
+import { MyFroggys } from "@/components/my-froggys";
+import { Home } from "@/components/home";
+import { generateBoxGridData } from "@/app/actions";
+import { DraggableContainer } from "@/components/ui/draggable-container";
+
+const boxGridData = generateBoxGridData();
 
 const tabsArray = [
-  { label: "Tab 1", content: "Welcome to Froggy Auctions" },
-  { label: "Tab 2", content: "First, you need to connect your wallet" },
-  { label: "Tab 3", content: "Then you can begin to wrap your Froggy inscriptions into SIP-009 NFTs" },
+  {
+    label: "Home",
+    content: <Home />,
+  },
+  { label: "Wallet", content: <MyFroggys /> },
+  { label: "Hop", content: <Hop /> },
 ];
 
-export default function Home() {
-  const [activeTab, setActiveTab] = useState("Tab 1");
+export default function Page() {
   return (
-    <main className="relative flex flex-col min-h-[100dvh] w-full justify-center items-center overflow-clip space-y-4">
-      <BoxesCore />
-      <Container className="flex flex-col z-10 min-h-[600px] max-w-4xl space-y-8">
-        <ConnectWallet />
-        <ContractCallVote />
-        <AccordionTabs tabsContentArray={tabsArray} className="z-10" />
-      </Container>
+    <main className="relative flex flex-col min-h-[100dvh] w-full justify-center items-center overflow-clip space-y-4 z-0">
+      <ConnectWallet className="absolute top-0 sm:right-0 m-2 max-sm:flex  max-sm:max-w-xs max-sm:w-full max-sm:mx-auto justify-center items-center" />
+      <BoxesCore boxGridData={boxGridData} />
 
-      {/* <Tabs tabsArray={tabsArray} activeTab={activeTab} setActiveTab={setActiveTab} className="z-10" />
-      <Accordion label="Accordion" content="This is the answer" className="z-10" /> */}
+      <DraggableContainer className="flex flex-col max-sm:max-w-xs max-w-3xl w-full max-sm:p-4 p-4 justify-center items-center">
+        <AccordionTabs className="" tabsContentArray={tabsArray} initialTab="Home" />
+      </DraggableContainer>
     </main>
   );
 }

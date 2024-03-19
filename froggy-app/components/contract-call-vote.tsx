@@ -1,16 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
 import { useConnect } from "@stacks/connect-react";
 import { StacksTestnet, StacksDevnet } from "@stacks/network";
 import { AnchorMode, PostConditionMode, stringUtf8CV } from "@stacks/transactions";
-import { userSession } from "@/components/connect-wallet";
+import { useIsClient } from "@/lib/hooks/use-is-client";
+import { useUserSession } from "@/app/providers";
 
 export const ContractCallVote = () => {
+  const { userSession } = useUserSession();
   const { doContractCall } = useConnect();
-
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const isClient = useIsClient();
 
   function vote(pick: string) {
     doContractCall({
@@ -23,7 +22,6 @@ export const ContractCallVote = () => {
       postConditionMode: PostConditionMode.Deny,
       postConditions: [],
       onFinish: (data) => {
-        console.log("onFinish:", data);
         window.open(`https://explorer.hiro.so/txid/${data.txId}?chain=testnet`, "_blank")?.focus();
       },
       onCancel: () => {
@@ -32,7 +30,7 @@ export const ContractCallVote = () => {
     });
   }
 
-  if (!mounted || !userSession.isUserSignedIn()) {
+  if (!isClient || !userSession?.isUserSignedIn()) {
     return null;
   }
 

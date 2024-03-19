@@ -8,7 +8,7 @@ type Props = {
   className?: string;
 };
 
-export default function Accordion({ label, content, className, ...rest }: Props) {
+export function Accordion({ label, content, className, ...rest }: Props) {
   const [showContent, setShowContent] = useState(false);
   const [contentHeight, setContentHeight] = useState("0px");
   const contentRef = useRef<HTMLDivElement>(null);
