@@ -51,7 +51,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   const sordTxOptions: SignedTokenTransferOptions = {
     anchorMode: AnchorMode.Any,
     recipient,
-    amount: 1n,
+    amount: 1000000n,
     network: network,
     senderKey: senderKey,
     memo: memo,

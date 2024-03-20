@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils/cn";
+import { ReactNode } from "react";
 
-export function Badge({ badgeText, className, ...rest }: { badgeText: string; className?: string }) {
+export function Badge({ children, className, ...rest }: { children: ReactNode; className?: string }) {
   return (
     <div
       className={cn(
@@ -9,7 +10,7 @@ export function Badge({ badgeText, className, ...rest }: { badgeText: string; cl
       )}
       {...rest}
     >
-      {badgeText}
+      {children}
     </div>
   );
 }

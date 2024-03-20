@@ -1,5 +1,5 @@
 import { kv } from "@vercel/kv";
-import { froggyData } from "@/lib/froggyData";
+import { froggyData } from "@/lib/froggy-data";
 
 export async function saveSordEvent(data: string) {
   try {

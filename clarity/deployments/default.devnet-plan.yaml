@@ -18,7 +18,7 @@ plan:
         - contract-publish:
             contract-name: Froggys
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            cost: 73850
+            cost: 73490
             path: contracts/Froggys.clar
             anchor-block-only: true
             clarity-version: 2
@@ -32,7 +32,7 @@ plan:
         - contract-publish:
             contract-name: nope
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            cost: 53860
+            cost: 56250
             path: contracts/nope.clar
             anchor-block-only: true
             clarity-version: 2
@@ -57,11 +57,4 @@ plan:
             path: contracts/wrapped-nothing-v8.clar
             anchor-block-only: true
             clarity-version: 2
-        - stx-transfer:
-            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            recipient: ST2R1VEVDTESA9RBV9A9WE971FP0QDBEQ72JHM973
-            mstx-amount: 1000000000
-            memo: "0x01"
-            cost: 10000
-
       epoch: "2.4"

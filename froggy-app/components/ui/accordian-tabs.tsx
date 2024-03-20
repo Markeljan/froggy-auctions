@@ -44,7 +44,7 @@ export const AccordionTabs = ({ tabsContentArray, initialTab, className, ...rest
             style={{
               backgroundColor: activeTab === label && showContent ? "#a36ec4" : "#C4A1FF",
             }}
-            className="flex cursor-pointer flex-1 border-2 border-black -m-[2px] max-sm:px-2 px-6 py-3 text-center font-bold transition-colors first:rounded-tl-md"
+            className="flex items-center justify-center cursor-pointer flex-1 border-2 border-black -m-[2px] max-sm:px-2 px-6 py-3 text-center font-bold transition-colors first:rounded-tl-md"
           >
             {label}
           </button>

@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils/cn";
 import { memo } from "react";
+import { copyToClipboard } from "@/lib/utils/misc";
 
 type BoxGridData = {
   id: number;
@@ -33,6 +34,7 @@ export const BoxesCore = ({
           {row.map(({ inscriptionId, fileUrl, color }, j) => (
             <motion.div
               key={`col` + j}
+              onClick={() => copyToClipboard(inscriptionId.toString())}
               className={cn(
                 "w-16 h-16 border-r border-t border-white relative cursor-cell active:cursor-none select-none"
               )}

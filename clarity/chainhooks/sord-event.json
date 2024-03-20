@@ -1,0 +1,16 @@
+{
+  "name": "froggy-hook",
+  "uuid": "9dc280e2-921f-428a-b2ba-3a75bec57f57",
+  "chain": "stacks",
+  "version": 1,
+  "networks": {
+    "devnet": {
+      "if_this": { "scope": "stx_event", "actions": ["transfer"] },
+      "end_block": null,
+      "then_that": { "http_post": { "url": "http://localhost:3000/api/sord-event", "authorization_header": "" } },
+      "start_block": 0,
+      "decode_clarity_values": true,
+      "expire_after_occurrence": null
+    }
+  }
+}

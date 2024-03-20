@@ -4,7 +4,6 @@ import { saveSordEvent, getSordEvents } from "@/app/actions";
 
 export async function POST(request: Request): Promise<NextResponse> {
   const data = await request.json();
-  console.log("SORD EVENT", data);
 
   const transaction = data.apply[0].transactions[0];
 
@@ -14,7 +13,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const stxReceipt = transaction.metadata.receipt.events.find((e: any) => e.type === "STXTransferEvent");
 
-  const memo = deserializedTx?.payload?.memo;
+  const memo = deserializedTx?.payload?.memo?.content;
 
   if (memo) {
     const stringifiedTx = JSON.stringify({
@@ -22,7 +21,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       sender: transaction.metadata.sender,
       recipient: stxReceipt?.data.recipient,
       amount: stxReceipt?.data.amount,
-      memo: deserializedTx?.payload?.memo?.content,
+      memo: memo,
     });
     console.log("Saving sord event", stringifiedTx);
     await saveSordEvent(stringifiedTx);
@@ -37,4 +36,3 @@ export async function GET(request: Request): Promise<NextResponse> {
   const events = await getSordEvents();
   return NextResponse.json(events, { status: 200 });
 }
-
