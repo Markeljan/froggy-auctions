@@ -9,12 +9,9 @@ import {
   uintCV,
 } from "@stacks/transactions";
 import { broadcastTransaction, AnchorMode } from "@stacks/transactions";
-import { StacksTestnet, StacksMainnet, StacksDevnet } from "@stacks/network";
-import { FROGGY_CONTRACT_ADDRESS } from "@/app/config";
+import { FROGGY_CONTRACT_ADDRESS, network } from "@/app/config";
 
 const senderKey = process.env.DEPLOYER_PRIVATE_KEY;
-
-const network = new StacksDevnet();
 
 type FormState =
   | {

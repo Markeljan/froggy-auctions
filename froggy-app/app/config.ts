@@ -1,2 +1,5 @@
+import { StacksDevnet } from "@stacks/network";
+
 export const FROGGY_CONTRACT_ADDRESS = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM";
 export const FROGGY_AUCTIONS_CONTRACT_ADDRESS = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM";
+export const network = new StacksDevnet();

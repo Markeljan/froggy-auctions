@@ -4,21 +4,15 @@ import {
   SignedTokenTransferOptions,
   getAddressFromPrivateKey,
   getNonce,
-  intCV,
   makeContractCall,
   makeSTXTokenTransfer,
-  principalCV,
   uintCV,
 } from "@stacks/transactions";
 import { broadcastTransaction, AnchorMode } from "@stacks/transactions";
-import { StacksTestnet, StacksMainnet, StacksDevnet } from "@stacks/network";
-import { FROGGY_CONTRACT_ADDRESS } from "@/app/config";
+import { FROGGY_CONTRACT_ADDRESS, network } from "@/app/config";
 import { tokenIdToInscriptionId } from "@/lib/utils/misc";
-import { makeSignTransaction } from "@stacks/connect";
 
 const senderKey = process.env.DEPLOYER_PRIVATE_KEY;
-
-const network = new StacksDevnet();
 
 type HopArgs = {
   tokenId: number;
