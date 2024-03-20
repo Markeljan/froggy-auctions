@@ -16,7 +16,7 @@ export const MyFroggys = () => {
   const isClient = useIsClient();
   const { userData } = useUserSession();
   const { userAddress } = userData;
-  const { data, isLoading, error } = useFroggysQuery(userAddress);
+  const { data, isLoading, error } = useFroggysQuery({ address: userAddress });
   const { data: sordEvents } = useChainhooksQuery();
   const [lastShownTxId, setLastShownTxId] = useState<string | null>(null);
 

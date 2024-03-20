@@ -17,8 +17,6 @@ import {
   createSTXPostCondition,
   createNonFungiblePostCondition,
   uintCV,
-  bufferCVFromString,
-  makeStandardNonFungiblePostCondition,
 } from "@stacks/transactions";
 import { useReadContract } from "@/lib/api/use-contract-query";
 import toast from "react-hot-toast";
