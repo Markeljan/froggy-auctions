@@ -4,12 +4,28 @@ import "@/app/globals.css";
 import { QueryProvider } from "@/components/query-provider";
 import { Toaster } from "react-hot-toast";
 import { UserSessionProvider } from "@/app/context";
+import { APP_URL } from "./config";
 
 const archivo = Archivo({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Froggy Auctions",
-  description: "Froggy Auctions",
+  description: "Hop between sOrdinals and SIP-009 NFTs",
+  openGraph: {
+    title: "Froggy Auctions",
+    description: "Hop between sOrdinals and SIP-009 NFTs",
+    type: "website",
+    url: APP_URL,
+    images: [
+      {
+        url: `${APP_URL}/og.png`,
+        width: 1200,
+        height: 630,
+        alt: "Froggy Auctions",
+      },
+    ],
+  },
+  metadataBase: new URL(APP_URL),
 };
 
 export default function RootLayout({

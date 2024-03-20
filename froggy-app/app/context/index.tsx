@@ -3,8 +3,7 @@
 import { shortenAddress } from "@/lib/utils/misc";
 import { AppConfig, Connect, UserSession, getUserSession } from "@stacks/connect-react";
 import { createContext, useState, useContext, useMemo } from "react";
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL;
+import { APP_URL } from "../config";
 
 const appConfig = new AppConfig(["store_write", "publish_data"]);
 const newUserSession = new UserSession({ appConfig });
