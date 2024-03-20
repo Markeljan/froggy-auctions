@@ -34,7 +34,7 @@ export const BoxesCore = ({
           {row.map(({ inscriptionId, fileUrl, color }, j) => (
             <motion.div
               key={`col` + j}
-              onClick={() => copyToClipboard(inscriptionId.toString())}
+              onClick={() => copyToClipboard(inscriptionId?.toString())}
               className={cn(
                 "w-16 h-16 border-r border-t border-white relative cursor-cell active:cursor-none select-none"
               )}

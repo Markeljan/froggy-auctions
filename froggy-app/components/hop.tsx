@@ -21,6 +21,7 @@ import {
 import { useReadContract } from "@/lib/api/use-contract-query";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import { Froggys } from "./froggys";
 
 export const Hop = () => {
   const { userData } = useUserSession();
@@ -137,47 +138,60 @@ export const Hop = () => {
   };
 
   return (
-    <div className="flex flex-col gap-y-4 items-center">
-      <img
-        src={froggyImage}
-        style={{ imageRendering: "pixelated", filter: isHopDisabled && isHopBackDisabled ? "grayscale(100%)" : "none" }}
-        alt="Froggy"
-        className="w-48 h-48 select-none pointer-events-none border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-      />
-      <form className="flex flex-col gap-y-4">
-        <div className="flex gap-x-2">
-          <Input
-            type="text"
-            id="inputValue"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Token / Inscription ID"
-            aria-label="Token / Inscription ID"
-            className="border-2 flex-grow"
-          />
-        </div>
+    <div className="flex w-full flex-col gap-y-4 items-center">
+      <div className="flex flex-col gap-y-4 items-center">
+        <img
+          src={froggyImage}
+          style={{
+            imageRendering: "pixelated",
+            filter: isHopDisabled && isHopBackDisabled ? "grayscale(100%)" : "none",
+          }}
+          alt="Froggy"
+          className="w-48 h-48 select-none pointer-events-none border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+        />
+        <form className="flex flex-col gap-y-4">
+          <div className="flex gap-x-2">
+            <Input
+              type="text"
+              id="inputValue"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="Token / Inscription ID"
+              aria-label="Token / Inscription ID"
+              className="border-2 flex-grow"
+            />
+          </div>
 
-        <div className="flex gap-x-2 justify-center">
-          <Button disabled={isHopDisabled || !isHopBackDisabled} onClick={handleHop} className="border-2 px-4 py-1">
-            Hop
-          </Button>
-          <Button disabled={isHopBackDisabled || !isHopDisabled} onClick={handleHopBack} className="border-2 px-4 py-1">
-            Hop Back
-          </Button>
+          <div className="flex gap-x-2 justify-center">
+            <Button disabled={isHopDisabled || !isHopBackDisabled} onClick={handleHop} className="border-2 px-4 py-1">
+              Hop
+            </Button>
+            <Button
+              disabled={isHopBackDisabled || !isHopDisabled}
+              onClick={handleHopBack}
+              className="border-2 px-4 py-1"
+            >
+              Hop Back
+            </Button>
+          </div>
+        </form>
+        <div className="flex gap-x-2 text-blue-500 hover:underline">
+          {sordTxId && (
+            <Link href={getExplorerUrl(sordTxId, "devnet")} target="_blank" rel="noopener noreferrer">
+              sordTxId: {sordTxId}
+            </Link>
+          )}
+          {hopTxId && (
+            <Link href={getExplorerUrl(hopTxId, "devnet")} target="_blank" rel="noopener noreferrer">
+              hopTxId: {hopTxId}
+            </Link>
+          )}
         </div>
-      </form>
-      <div className="flex gap-x-2 text-blue-500 hover:underline">
-        {sordTxId && (
-          <Link href={getExplorerUrl(sordTxId, "devnet")} target="_blank" rel="noopener noreferrer">
-            sordTxId: {sordTxId}
-          </Link>
-        )}
-        {hopTxId && (
-          <Link href={getExplorerUrl(hopTxId, "devnet")} target="_blank" rel="noopener noreferrer">
-            hopTxId: {hopTxId}
-          </Link>
-        )}
       </div>
+      <div className="flex flex-col gap-y-2 w-full mt-2 max-sm:px-0 px-8">
+        <p className="text-lg">Your Froggys</p>
+      </div>
+      <Froggys onChange={(value) => setInputValue(value)} />
     </div>
   );
 };

@@ -6,7 +6,7 @@ export function shortenAddress(address: string) {
 }
 
 export async function copyToClipboard(text: string) {
-  navigator.clipboard.writeText(text);
+  await navigator?.clipboard?.writeText(text);
   toast("Copied to clipboard", { icon: "📋" });
 }
 

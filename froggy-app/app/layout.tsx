@@ -6,7 +6,7 @@ import { Toaster } from "react-hot-toast";
 import { UserSessionProvider } from "@/app/context";
 import { APP_URL } from "./config";
 
-const archivo = Archivo({ subsets: ["latin"] });
+const archivo = Archivo({ subsets: ["latin"], weight:["400", "600", "700"] });
 
 export const metadata: Metadata = {
   title: "Froggy Auctions",

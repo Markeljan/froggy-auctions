@@ -4,7 +4,7 @@ type Props = {
   imageUrl: string;
   children: React.ReactNode;
   className?: string;
-};
+} & React.HTMLAttributes<HTMLElement>;
 
 export function ImageCard({ imageUrl, children, className, ...rest }: Props) {
   return (
