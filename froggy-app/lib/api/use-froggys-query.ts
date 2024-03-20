@@ -12,12 +12,10 @@ async function fetchFroggys(address?: string) {
   return froggys;
 }
 
-export function useFetchFroggys(address?: string) {
-  const { isPending, error, data, isFetching } = useQuery({
+export function useFroggysQuery(address?: string) {
+  return useQuery({
     queryKey: ["froggys", address],
     queryFn: () => fetchFroggys(address),
     enabled: !!address,
   });
-
-  return { isPending, error, data, isFetching };
 }

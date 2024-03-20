@@ -1,8 +1,8 @@
 "use client";
 
 import { shortenAddress } from "@/lib/utils/misc";
-import { AppConfig, Connect, UserSession, getOrCreateUserSession, getUserSession } from "@stacks/connect-react";
-import { createContext, useState, useContext, useEffect, useMemo } from "react";
+import { AppConfig, Connect, UserSession, getUserSession } from "@stacks/connect-react";
+import { createContext, useState, useContext, useMemo } from "react";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL;
 
@@ -31,12 +31,11 @@ const UserSessionContext = createContext<UserSessionContextType>({
 
 export function UserSessionProvider({ children }: { children: React.ReactNode }) {
   const [userSession, setUserSession] = useState<UserSession | undefined>(getUserSession(newUserSession));
-
-  const isSignedIn = userSession?.isUserSignedIn();
+  const [isSignedIn, setIsSignedIn] = useState(userSession?.isUserSignedIn() || false);
 
   const [userAddress, shortUserAddress] = useMemo(() => {
     if (isSignedIn) {
-      const address = userSession?.loadUserData().profile.stxAddress.mainnet;
+      const address = userSession?.loadUserData()?.profile?.stxAddress?.testnet || "";
       return [address, shortenAddress(address)];
     }
     return [undefined, undefined];
@@ -51,6 +50,7 @@ export function UserSessionProvider({ children }: { children: React.ReactNode })
         },
         onFinish: ({ userSession: payloadUserSession }) => {
           setUserSession(payloadUserSession);
+          setIsSignedIn(payloadUserSession?.isUserSignedIn());
         },
         userSession,
       }}

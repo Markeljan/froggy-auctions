@@ -2,7 +2,7 @@
 
 import toast from "react-hot-toast";
 import { useConnect } from "@stacks/connect-react";
-import { useUserSession } from "@/app/providers";
+import { useUserSession } from "@/app/context";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { useIsClient } from "@/lib/hooks/use-is-client";

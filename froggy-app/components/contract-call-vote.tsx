@@ -4,7 +4,7 @@ import { useConnect } from "@stacks/connect-react";
 import { StacksTestnet, StacksDevnet } from "@stacks/network";
 import { AnchorMode, PostConditionMode, stringUtf8CV } from "@stacks/transactions";
 import { useIsClient } from "@/lib/hooks/use-is-client";
-import { useUserSession } from "@/app/providers";
+import { useUserSession } from "@/app/context";
 
 export const ContractCallVote = () => {
   const { userSession } = useUserSession();

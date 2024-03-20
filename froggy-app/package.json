@@ -11,7 +11,10 @@
   "dependencies": {
     "@stacks/connect": "^7.7.1",
     "@stacks/connect-react": "^22.4.2",
+    "@stacks/transactions": "^6.12.1",
+    "@stacks/wallet-sdk": "^6.12.1",
     "@tanstack/react-query": "^5.28.4",
+    "@vercel/kv": "^1.0.1",
     "clsx": "^2.1.0",
     "framer-motion": "^11.0.8",
     "next": "14.1.3",
