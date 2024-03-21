@@ -188,8 +188,8 @@ export const Hop = () => {
           )}
         </div>
       </div>
-      <div className="flex flex-col gap-y-2 w-full mt-2 max-sm:px-0 px-8">
-        <p className="text-lg">Your Froggys</p>
+      <div className="flex flex-col gap-y-2 w-full mt-4 max-sm:px-0 px-8">
+        <p className="text-2xl">Owned Froggys</p>
       </div>
       <Froggys onChange={(value) => setInputValue(value)} />
     </div>

@@ -9,6 +9,8 @@ import { useIsClient } from "@/lib/hooks/use-is-client";
 import { useChainhooksQuery } from "@/lib/api/use-chainhooks-query";
 import toast from "react-hot-toast";
 import { shortenAddress } from "@/lib/utils/misc";
+import Link from "next/link";
+import { Badge } from "./ui/badge";
 
 export const Froggys = ({ onChange }: { onChange: (value: string) => void }) => {
   const isClient = useIsClient();
@@ -42,8 +44,16 @@ export const Froggys = ({ onChange }: { onChange: (value: string) => void }) => 
 
   if (!userAddress) {
     return (
-      <div className="flex items-center justify-center w-full">
-        <p className="text-lg text-center">Connect your wallet to see your Froggys</p>
+      <div className="flex items-center justify-center w-full pb-8">
+        <p className="text-lg text-gray-500 text-center">Connect your wallet to see your Froggys</p>
+      </div>
+    );
+  }
+
+  if (userAddress && !isLoading && !data?.length) {
+    return (
+      <div className="flex items-center justify-center w-full pb-8">
+        <p className="text-lg text-gray-500 text-center">{`You don't have any Froggys! Go get some!`}</p>
       </div>
     );
   }
