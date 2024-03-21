@@ -2,6 +2,8 @@
 
 Froggy Auctions showcases a way to interpoerate between the sOrdinals metaprotocol and Stacks native SIP-009 NFTs. 
 
+<img width="1726" alt="image" src="https://github.com/Markeljan/froggy-auctions/assets/12901349/6ee2a9be-e49a-4fac-9757-68685dd7245e">
+
 ## How it Works
 
 Froggy Auctions operates through a simple process:
@@ -23,10 +25,16 @@ Froggy Clarity smart contract. There are two main functions:
 - **hop**: This function is responsible for vaulting Froggy inscriptions and minting SIP-009 Froggies to the recipient.
 - **hop-back**: Used to vault SIP-009 Froggies and recover the inscription.
 
+#### Clarinet Testing
+
+![image](https://github.com/Markeljan/froggy-auctions/assets/12901349/efc8aa3f-de42-45b5-91cd-b6f8b28b4589)
+
+
 ### Chainhook
 
-A chainhook is employed to track STX transfers with memos. These are stored in a database which is then subscribed to by the frontend to display real-time froggy transactions.
+A chainhook is used to track STX transfers with memos. After hitting our serverless API each valid event is saved to our database which is then subscribed to from our frontend to display real-time froggy transactions to any site vistors via toasts.
 
 ## Usage
 
-Currently the project is available for local development running a devnt with Clarinet.
+Currently the project is available for local development running a devnt with Clarinet with live mainnet deployments OTW.
+
