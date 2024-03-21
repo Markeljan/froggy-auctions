@@ -6,7 +6,7 @@ import { fetchHop } from "@/lib/api/fetch-hop";
 import Input from "./ui/input";
 import { Button } from "./ui/button";
 import { useConnect } from "@stacks/connect-react";
-import { FROGGY_AGENT_ADDRESS, FROGGY_CONTRACT_ADDRESS, network } from "@/app/config";
+import { FROGGY_AGENT_ADDRESS_DEVNET, FROGGY_CONTRACT_ADDRESS_DEVNET, network } from "@/app/config";
 import { getExplorerUrl, inscriptionIdToTokenId, tokenIdToInscriptionId } from "@/lib/utils/misc";
 import { useFroggysQuery } from "@/lib/api/use-froggys-query";
 import {
@@ -34,13 +34,14 @@ export const Hop = () => {
   const [hopTxId, setHopTxId] = useState<string>();
   const { data } = useFroggysQuery({ inscriptionId: inscriptionId });
   const { data: readTokenOwner } = useReadContract({
-    contractAddress: FROGGY_CONTRACT_ADDRESS,
+    contractAddress: FROGGY_CONTRACT_ADDRESS_DEVNET,
     contractName: "Froggys",
     functionName: "get-owner",
     functionArgs: [tokenId],
     enabled: !!tokenId,
   });
-  const froggyImage = data?.fileUrl || "/78942.png";
+
+  const froggyImage = `/frogs/${tokenId || 1}.png`;
   const isHopDisabled = !!data?.owner ? data?.owner !== userAddress : true;
   const isHopBackDisabled = !!readTokenOwner ? readTokenOwner !== userAddress : true;
 
@@ -49,7 +50,7 @@ export const Hop = () => {
     if (!userAddress || !tokenId) return;
 
     await doSTXTransfer({
-      recipient: FROGGY_AGENT_ADDRESS,
+      recipient: FROGGY_AGENT_ADDRESS_DEVNET,
       amount: 1n,
       memo: `t${inscriptionId}`,
       network: network,
@@ -99,12 +100,12 @@ export const Hop = () => {
     const sendNftPostCondition = createNonFungiblePostCondition(
       userAddress,
       NonFungibleConditionCode.Sends,
-      createAssetInfo(FROGGY_CONTRACT_ADDRESS, "Froggys", "froggys"),
+      createAssetInfo(FROGGY_CONTRACT_ADDRESS_DEVNET, "Froggys", "froggys"),
       uintCV(tokenId)
     );
 
     await doContractCall({
-      contractAddress: FROGGY_CONTRACT_ADDRESS,
+      contractAddress: FROGGY_CONTRACT_ADDRESS_DEVNET,
       contractName: "Froggys",
       functionName: "hop-back",
       functionArgs: [uintCV(tokenId)],

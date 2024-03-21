@@ -2,14 +2,12 @@
 
 import {
   SignedContractCallOptions,
-  bufferCVFromString,
   makeContractCall,
   principalCV,
-  stringCV,
   uintCV,
 } from "@stacks/transactions";
 import { broadcastTransaction, AnchorMode } from "@stacks/transactions";
-import { FROGGY_CONTRACT_ADDRESS, network } from "@/app/config";
+import { FROGGY_CONTRACT_ADDRESS_DEVNET, network } from "@/app/config";
 
 const senderKey = process.env.DEPLOYER_PRIVATE_KEY;
 
@@ -33,7 +31,7 @@ export const hop = async (formState: FormState, formData: FormData) => {
   const txOptions: SignedContractCallOptions = {
     anchorMode: AnchorMode.Any,
     network: network,
-    contractAddress: FROGGY_CONTRACT_ADDRESS,
+    contractAddress: FROGGY_CONTRACT_ADDRESS_DEVNET,
     functionName: "hop",
     functionArgs: [uintCV(tokenId), principalCV(recipient)],
     contractName: "Froggys",

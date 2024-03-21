@@ -63,13 +63,13 @@ export const Froggys = ({ onChange }: { onChange: (value: string) => void }) => 
           <VscLoading className="animate-spin w-full h-full" />
         </div>
       ) : (
-        data?.map((froggy: { fileUrl: string; id: string }, index: number) => (
+        data?.map((froggy: { id: string }, index: number) => (
           <ImageCard
             onClick={() => {
               onChange(froggy.id);
             }}
             className="max-w-[150px] w-full mx-auto cursor-pointer "
-            imageUrl={froggy.fileUrl}
+            imageUrl={`/frogs/${froggy.id}.png`}
             key={index}
           >
             {froggy.id}

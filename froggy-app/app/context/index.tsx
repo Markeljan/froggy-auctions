@@ -45,7 +45,7 @@ export function UserSessionProvider({ children }: { children: React.ReactNode })
       authOptions={{
         appDetails: {
           name: "Froggy Auctions",
-          icon: `${APP_URL}/78942.png`,
+          icon: `${APP_URL}/frogs/4546.png`,
         },
         onFinish: ({ userSession: payloadUserSession }) => {
           setUserSession(payloadUserSession);

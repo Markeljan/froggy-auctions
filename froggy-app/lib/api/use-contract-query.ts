@@ -6,7 +6,7 @@ import {
   SmartContractsApi,
   SmartContractsApiInterface,
 } from "@stacks/blockchain-api-client";
-import { FROGGY_AGENT_ADDRESS, apiConfig } from "@/app/config";
+import { FROGGY_AGENT_ADDRESS_DEVNET, apiConfig } from "@/app/config";
 import { uintCV, cvToHex, hexToCV, cvToValue } from "@stacks/transactions";
 
 const contractsApi: SmartContractsApiInterface = new SmartContractsApi(apiConfig);
@@ -34,7 +34,7 @@ async function readContract({ contractAddress, contractName, functionName, funct
     contractName,
     functionName,
     readOnlyFunctionArgs: {
-      sender: FROGGY_AGENT_ADDRESS,
+      sender: FROGGY_AGENT_ADDRESS_DEVNET,
       arguments: functionArgsCV,
     },
   });

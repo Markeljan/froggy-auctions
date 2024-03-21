@@ -10,6 +10,7 @@ type BoxGridData = {
   inscriptionId: number;
   inscriptionHash: string;
   fileUrl: string;
+  imageUrl: string;
   color: string;
 };
 
@@ -31,7 +32,7 @@ export const BoxesCore = ({
     >
       {boxGridData.map((row, i) => (
         <motion.div key={`row` + i} className="w-16 h-16">
-          {row.map(({ inscriptionId, fileUrl, color }, j) => (
+          {row.map(({ inscriptionId, imageUrl, color }, j) => (
             <motion.div
               key={`col` + j}
               onClick={() => copyToClipboard(inscriptionId?.toString())}
@@ -40,7 +41,7 @@ export const BoxesCore = ({
               )}
             >
               <img
-                src={fileUrl}
+                src={imageUrl}
                 alt={`Froggy #${inscriptionId}`}
                 style={{
                   position: "absolute",
