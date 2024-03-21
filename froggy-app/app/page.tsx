@@ -30,7 +30,7 @@ export default function Page() {
           <p className="max-2xl:text-sm text-lg">Hop between sOrdinals and SIP-009 NFTs</p>
         </Button>
       </Container>
-      <Container className="flex flex-col max-sm:max-w-sm max-lg:max-w-md max-w-3xl w-full max-2xl:p-4 p-8 justify-center items-center z-10">
+      <Container className="flex flex-col max-sm:max-w-sm max-lg:max-w-md max-w-3xl w-full p-4 px-8 justify-center items-center z-10">
         <AccordionTabs className="" tabsContentArray={tabsArray} initialTab="About" />
       </Container>
     </main>

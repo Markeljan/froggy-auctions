@@ -71,7 +71,7 @@ export const AccordionTabs = ({ tabsContentArray, initialTab, className, ...rest
             "overflow-y-auto no-scrollbar border-2 border-t-0 border-black rounded-b-[5px] -ml-[2px] bg-white font-bold",
             {
               "transition-[height] ease-in-out": shouldTransition,
-              "max-sm:h-[390px] sm:h-[600px] border-2 border-black": activeTab === label && showContent,
+              "max-sm:h-[400px] sm:h-[600px] border-2 border-black": activeTab === label && showContent,
               "h-0 border-none": activeTab !== label || !showContent,
             }
           )}

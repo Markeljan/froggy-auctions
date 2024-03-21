@@ -1,10 +1,10 @@
 import { Button } from "./ui/button";
+import Input from "./ui/input";
 
 export const Auction = () => {
   return (
-    <div className="flex w-full flex-col gap-y-4 items-center">
+    <div className="flex w-full flex-col gap-y-4 items-center pb-8">
       <div className="flex flex-col gap-y-4 items-center">
-        <p className="text-lg text-center">Soon TM</p>
         <img
           src={"/78942.png"}
           style={{
@@ -16,14 +16,16 @@ export const Auction = () => {
         />
 
         {/* fake price and info */}
-        <div className="flex flex-col gap-y-2">
-          <p className="text-lg">Price: 0.1 STX</p>
-          <p className="text-lg">Highest Bid: 0.2 STX</p>
+        <div className="flex items-center justify-center">
+          <p className="text-sm">Highest Bid: 9m</p>
+          <img src="/not.png" alt="nothing" className="w-8 h-8" />
         </div>
-
-        <Button disabled={true} className="border-2 px-4 py-1">
-          Bid
-        </Button>
+        <div className="flex gap-x-2 justify-center">
+          <Input disabled placeholder="amount" />
+          <Button disabled={true} className="border-2 px-4 py-1">
+            Bid
+          </Button>
+        </div>
       </div>
     </div>
   );
