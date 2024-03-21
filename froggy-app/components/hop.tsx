@@ -32,7 +32,6 @@ export const Hop = () => {
   const tokenId = inputValueNumber > 10000 ? inscriptionIdToTokenId(inputValueNumber) : inputValueNumber;
   const inscriptionId = inputValueNumber <= 10000 ? tokenIdToInscriptionId(inputValueNumber) : inputValueNumber;
   const [hopTxId, setHopTxId] = useState<string>();
-  const [sordTxId, setSordTxId] = useState<string>();
   const { data } = useFroggysQuery({ inscriptionId: inscriptionId });
   const { data: readTokenOwner } = useReadContract({
     contractAddress: FROGGY_CONTRACT_ADDRESS,
@@ -43,10 +42,7 @@ export const Hop = () => {
   });
   const froggyImage = data?.fileUrl || "/78942.png";
   const isHopDisabled = !!data?.owner ? data?.owner !== userAddress : true;
-  console.log("userAddress", userAddress);
-  console.log("readTokenOwner", readTokenOwner);
   const isHopBackDisabled = !!readTokenOwner ? readTokenOwner !== userAddress : true;
-  console.log("isHopDisabled", isHopDisabled);
 
   const handleHop = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -176,11 +172,6 @@ export const Hop = () => {
           </div>
         </form>
         <div className="flex gap-x-2 text-blue-500 hover:underline">
-          {sordTxId && (
-            <Link href={getExplorerUrl(sordTxId, "devnet")} target="_blank" rel="noopener noreferrer">
-              sordTxId: {sordTxId}
-            </Link>
-          )}
           {hopTxId && (
             <Link href={getExplorerUrl(hopTxId, "devnet")} target="_blank" rel="noopener noreferrer">
               hopTxId: {hopTxId}

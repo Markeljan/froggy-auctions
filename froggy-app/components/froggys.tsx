@@ -9,8 +9,6 @@ import { useIsClient } from "@/lib/hooks/use-is-client";
 import { useChainhooksQuery } from "@/lib/api/use-chainhooks-query";
 import toast from "react-hot-toast";
 import { shortenAddress } from "@/lib/utils/misc";
-import Link from "next/link";
-import { Badge } from "./ui/badge";
 
 export const Froggys = ({ onChange }: { onChange: (value: string) => void }) => {
   const isClient = useIsClient();

@@ -17,9 +17,9 @@ export const Auction = () => {
         <div className="flex items-center justify-center">
           <p className="text-lg bg-gray-300">Highest Bid: 9,000,000</p>
         </div>
-        <div className="flex gap-x-2 justify-center">
-          <Input disabled placeholder="coming soon" />
-          <Button disabled={true} className="flex border-2 px-4 py-1">
+        <div className="flex justify-center">
+          <Input className="flex w-1/2 mr-2" disabled placeholder="coming soon" />
+          <Button disabled={true} className="flex w-1/3 justify-center items-center px-4 py-1">
             Bid
             <img src="/not.png" alt="nothing" className="ml-2 w-8 h-8" />
           </Button>
