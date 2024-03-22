@@ -42,6 +42,7 @@ import { useReadContract } from "@/lib/api/use-contract-query";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { Froggys } from "@/components/froggys";
+import { SordinalsFroggyData } from "@/lib/types";
 
 export const Hop = () => {
   const { userData } = useUserSession();
@@ -52,8 +53,7 @@ export const Hop = () => {
   const tokenId = inputValueNumber > 10000 ? inscriptionIdToTokenId(inputValueNumber) : inputValueNumber;
   const inscriptionId = inputValueNumber <= 10000 ? tokenIdToInscriptionId(inputValueNumber) : inputValueNumber;
   const [hopTxId, setHopTxId] = useState<string>();
-  const { data } = useFroggysQuery({ inscriptionId: inscriptionId });
-  
+  const { data } = useFroggysQuery({ inscriptionId: inscriptionId }) as { data: SordinalsFroggyData };
   const { data: readTokenOwner } = useReadContract({
     contractAddress: FROGGY_CONTRACT_ADDRESS,
     contractName: "froggys",

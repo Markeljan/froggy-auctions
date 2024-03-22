@@ -20,7 +20,7 @@ if (!FROGGY_AGENT_KEY || !CRON_SECRET) {
   throw new Error("FROGGY_AGENT_KEY or CRON_SECRET is not set");
 }
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   const auth = request.headers.get("authorization");
   if (auth !== `Bearer ${CRON_SECRET}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
