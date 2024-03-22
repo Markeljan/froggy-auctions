@@ -9,12 +9,16 @@ import { useIsClient } from "@/lib/hooks/use-is-client";
 import { useChainhooksQuery } from "@/lib/api/use-chainhooks-query";
 import toast from "react-hot-toast";
 import { inscriptionIdToTokenId, shortenAddress } from "@/lib/utils/misc";
+import { SordinalsFroggyData } from "@/lib/types";
 
 export const Froggys = ({ onChange }: { onChange: (value: string) => void }) => {
   const isClient = useIsClient();
   const { userData } = useUserSession();
   const { userAddress } = userData;
-  const { data, isLoading } = useFroggysQuery({ address: userAddress });
+  const { data, isLoading } = useFroggysQuery({ address: userAddress }) as {
+    data: SordinalsFroggyData[];
+    isLoading: boolean;
+  };
   const { data: sordEvents } = useChainhooksQuery();
   const [lastShownTxId, setLastShownTxId] = useState<string | null>(null);
 
