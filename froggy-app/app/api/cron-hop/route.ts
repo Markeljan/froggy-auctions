@@ -80,6 +80,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       contractName: "froggys",
       senderKey: FROGGY_AGENT_KEY,
       network: network,
+      fee: 50000n, // 0.05 STX
     };
 
     try {

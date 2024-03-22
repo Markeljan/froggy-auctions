@@ -36,6 +36,7 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 import { Froggys } from "@/components/froggys";
 import { SordinalsFroggyData } from "@/lib/types";
+import { postHopBack } from "@/lib/api/post-hop-back";
 
 export const Hop = () => {
   const { userData } = useUserSession();
@@ -128,7 +129,8 @@ export const Hop = () => {
         toast("Transaction cancelled", { icon: "🚫" });
         return;
       },
-      onFinish: (result) => {
+      onFinish: async (result) => {
+        await postHopBack({ txid: result.txId });
         toast(
           <div className="flex flex-col space-x-2 items-center">
             <p>Transaction submitted</p>

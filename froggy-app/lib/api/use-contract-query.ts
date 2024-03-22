@@ -33,6 +33,8 @@ async function readContract({ contractAddress, contractName, functionName, funct
     },
   });
 
+  console.log(fnCall);
+
   const convertedResultVal = fnCall.result && cvToValue(hexToCV(fnCall.result))?.value?.value;
 
   return convertedResultVal || null;

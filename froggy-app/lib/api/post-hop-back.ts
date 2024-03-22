@@ -1,12 +1,11 @@
-export async function postHopBack({ tokenId, recipientAddress }: { tokenId: number; recipientAddress: string }) {
+export async function postHopBack({ txid }: { txid: string }) {
   const response = await fetch("/api/hop-back", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      tokenId: tokenId,
-      recipient: recipientAddress,
+      txid,
     }),
   });
 

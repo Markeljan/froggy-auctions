@@ -32,6 +32,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   if (!memo?.startsWith(TRANSFER_PREFIX)) {
     return NextResponse.json({ error: "Invalid memo" }, { status: 400 });
   }
+  
   const inscriptionHashFromMemo = memo.slice(TRANSFER_PREFIX.length);
   const inscriptionId = inscriptionHashToTokenId(inscriptionHashFromMemo);
   if (!inscriptionId) {
