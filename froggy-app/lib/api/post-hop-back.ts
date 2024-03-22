@@ -1,4 +1,4 @@
-export async function fetchHopBack({ tokenId, recipientAddress }: { tokenId: number; recipientAddress: string }) {
+export async function postHopBack({ tokenId, recipientAddress }: { tokenId: number; recipientAddress: string }) {
   const response = await fetch("/api/hop-back", {
     method: "POST",
     headers: {

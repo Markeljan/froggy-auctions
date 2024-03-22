@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useUserSession } from "@/app/context";
-import { fetchHop } from "@/lib/api/fetch-hop";
+import { postHop } from "@/lib/api/post-hop";
 import Input from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useConnect } from "@stacks/connect-react";
@@ -29,13 +29,6 @@ import {
   createNonFungiblePostCondition,
   uintCV,
   bufferCV,
-  createMemoString,
-  hexToCV,
-  cvToString,
-  stringCV,
-  serializeMemoString,
-  StacksMessageType,
-  cvToHex,
   principalCV,
 } from "@stacks/transactions";
 import { useReadContract } from "@/lib/api/use-contract-query";
@@ -90,7 +83,7 @@ export const Hop = () => {
         console.log("STX Transfer result:", result.txId);
 
         // send hop data to the agent
-        await fetchHop({ txid: result.txId });
+        await postHop({ txid: result.txId });
         console.log("Hop result:", result);
 
         toast(

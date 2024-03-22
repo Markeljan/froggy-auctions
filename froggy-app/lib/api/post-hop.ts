@@ -1,4 +1,4 @@
-export async function fetchHop({ txid }: { txid: string }) {
+export async function postHop({ txid }: { txid: string }) {
   const response = await fetch("/api/hop", {
     method: "POST",
     headers: {

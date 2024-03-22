@@ -10,7 +10,7 @@ import {
 } from "@/app/config";
 import { getFroggyHops, updateFroggyByIndex } from "@/app/actions";
 import { FroggyHopTransaction } from "@/lib/types";
-import { tokenIdToInscriptionId } from "@/lib/utils/misc";
+import { inscriptionIdToTokenId } from "@/lib/utils/misc";
 
 const FROGGY_AGENT_KEY = `${process.env.FROGGY_AGENT_KEY}`;
 
@@ -37,17 +37,17 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     (sord: { parentHash: string }) => sord.parentHash === FROGGYS_PARENT_HASH
   );
 
+  console.log("agentFroggys:", agentFroggys);
+
   // loop through the hops, until one is successfully executed
   for (const hop of hopList) {
     const { inscriptionId, txStatus, hopStatus, recipient, txid, sender } = hop;
     if (hopStatus !== "pending") {
       continue;
     }
-
+    console.log("Executing hop for inscriptionId:", inscriptionId);
     // check if the froggy agent owns the froggy
-    const isFroggyHeldByAgent = agentFroggys?.some(
-      (sord: { inscriptionId: number }) => sord.inscriptionId === inscriptionId
-    );
+    const isFroggyHeldByAgent = agentFroggys?.some((sord: { id: string }) => parseInt(sord.id) === inscriptionId);
 
     if (!isFroggyHeldByAgent) {
       console.error(`Froggy not held by agent: ${inscriptionId}`);
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       continue;
     }
 
-    const tokenId = tokenIdToInscriptionId(inscriptionId);
+    const tokenId = inscriptionIdToTokenId(inscriptionId);
     if (!tokenId) {
       console.error(`Failed to get tokenId for inscriptionId: ${inscriptionId}`);
       continue;
