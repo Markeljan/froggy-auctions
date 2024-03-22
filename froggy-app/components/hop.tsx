@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { useUserSession } from "@/app/context";
 import { fetchHop } from "@/lib/api/fetch-hop";
-import Input from "./ui/input";
-import { Button } from "./ui/button";
+import Input from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useConnect } from "@stacks/connect-react";
-import { FROGGY_AGENT_ADDRESS_DEVNET, FROGGY_CONTRACT_ADDRESS_DEVNET, network } from "@/app/config";
+import { APP_NETWORK, FROGGY_AGENT_ADDRESS, FROGGY_CONTRACT_ADDRESS, network } from "@/app/config";
 import { getExplorerUrl, inscriptionIdToTokenId, tokenIdToInscriptionId } from "@/lib/utils/misc";
 import { useFroggysQuery } from "@/lib/api/use-froggys-query";
 import {
@@ -21,7 +21,7 @@ import {
 import { useReadContract } from "@/lib/api/use-contract-query";
 import toast from "react-hot-toast";
 import Link from "next/link";
-import { Froggys } from "./froggys";
+import { Froggys } from "@/components/froggys";
 
 export const Hop = () => {
   const { userData } = useUserSession();
@@ -34,8 +34,8 @@ export const Hop = () => {
   const [hopTxId, setHopTxId] = useState<string>();
   const { data } = useFroggysQuery({ inscriptionId: inscriptionId });
   const { data: readTokenOwner } = useReadContract({
-    contractAddress: FROGGY_CONTRACT_ADDRESS_DEVNET,
-    contractName: "Froggys",
+    contractAddress: FROGGY_CONTRACT_ADDRESS,
+    contractName: "froggys",
     functionName: "get-owner",
     functionArgs: [tokenId],
     enabled: !!tokenId,
@@ -49,8 +49,9 @@ export const Hop = () => {
     event.preventDefault();
     if (!userAddress || !tokenId) return;
 
+    // user sends froggy to FROGGY_AGENT_ADDRESS
     await doSTXTransfer({
-      recipient: FROGGY_AGENT_ADDRESS_DEVNET,
+      recipient: FROGGY_AGENT_ADDRESS,
       amount: 1n,
       memo: `t${inscriptionId}`,
       network: network,
@@ -58,37 +59,28 @@ export const Hop = () => {
         toast("Transaction cancelled", { icon: "🚫" });
         return;
       },
-      onFinish: (result) => {
+      onFinish: async (result) => {
         console.log("STX Transfer result:", result.txId);
+
+        // send hop data to the agent
+        await fetchHop({ txid: result.txId });
+        console.log("Hop result:", result);
+
         toast(
           <div className="flex flex-col space-x-2 items-center">
-            <p>Transaction submitted</p>
-            <Link href={getExplorerUrl(result.txId, "devnet")} target="_blank" rel="noopener noreferrer">
+            <p>Hop transaction submitted</p>
+            <Link href={getExplorerUrl(result.txId, APP_NETWORK)} target="_blank" rel="noopener noreferrer">
               View on Explorer
             </Link>
           </div>,
           {
-            icon: "✅",
+            icon: "🐸",
           }
         );
+
+        setHopTxId(result.txId);
       },
     });
-
-    const result = await fetchHop({ tokenId: tokenId, recipientAddress: userAddress });
-    console.log("Hop result:", result);
-    toast(
-      <div className="flex flex-col space-x-2 items-center">
-        <p>Hop transaction submitted</p>
-        <Link href={getExplorerUrl(result.txId, "devnet")} target="_blank" rel="noopener noreferrer">
-          View on Explorer
-        </Link>
-      </div>,
-      {
-        icon: "🐸",
-      }
-    );
-
-    setHopTxId(result.txid);
   };
 
   const handleHopBack = async (event: React.FormEvent) => {
@@ -100,13 +92,13 @@ export const Hop = () => {
     const sendNftPostCondition = createNonFungiblePostCondition(
       userAddress,
       NonFungibleConditionCode.Sends,
-      createAssetInfo(FROGGY_CONTRACT_ADDRESS_DEVNET, "Froggys", "froggys"),
+      createAssetInfo(FROGGY_CONTRACT_ADDRESS, "froggys", "froggys"),
       uintCV(tokenId)
     );
 
     await doContractCall({
-      contractAddress: FROGGY_CONTRACT_ADDRESS_DEVNET,
-      contractName: "Froggys",
+      contractAddress: FROGGY_CONTRACT_ADDRESS,
+      contractName: "froggys",
       functionName: "hop-back",
       functionArgs: [uintCV(tokenId)],
       network: network,
@@ -120,7 +112,7 @@ export const Hop = () => {
         toast(
           <div className="flex flex-col space-x-2 items-center">
             <p>Transaction submitted</p>
-            <Link href={getExplorerUrl(result.txId, "devnet")} target="_blank" rel="noopener noreferrer">
+            <Link href={getExplorerUrl(result.txId, APP_NETWORK)} target="_blank" rel="noopener noreferrer">
               View on Explorer
             </Link>
           </div>,
@@ -174,7 +166,7 @@ export const Hop = () => {
         </form>
         <div className="flex gap-x-2 text-blue-500 hover:underline">
           {hopTxId && (
-            <Link href={getExplorerUrl(hopTxId, "devnet")} target="_blank" rel="noopener noreferrer">
+            <Link href={getExplorerUrl(hopTxId, APP_NETWORK)} target="_blank" rel="noopener noreferrer">
               hopTxId: {hopTxId}
             </Link>
           )}

@@ -3,10 +3,11 @@
 import { shortenAddress } from "@/lib/utils/misc";
 import { AppConfig, Connect, UserSession, getUserSession } from "@stacks/connect-react";
 import { createContext, useState, useContext, useMemo } from "react";
-import { APP_URL } from "../config";
+import { APP_NETWORK, APP_URL } from "@/app/config";
 
 const appConfig = new AppConfig(["store_write", "publish_data"]);
 const newUserSession = new UserSession({ appConfig });
+const userSessionNetwork = APP_NETWORK === "mainnet" ? "mainnet" : "testnet";
 
 type UserSessionContextType = {
   userSession: UserSession | undefined;
@@ -34,7 +35,7 @@ export function UserSessionProvider({ children }: { children: React.ReactNode })
 
   const [userAddress, shortUserAddress] = useMemo(() => {
     if (isSignedIn) {
-      const address = userSession?.loadUserData()?.profile?.stxAddress?.testnet || "";
+      const address = userSession?.loadUserData()?.profile?.stxAddress?.[userSessionNetwork] || "";
       return [address, shortenAddress(address)];
     }
     return [undefined, undefined];

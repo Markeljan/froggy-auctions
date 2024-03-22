@@ -1,8 +1,7 @@
 "use client";
 
+import { FROGGYS_PARENT_HASH } from "@/app/config";
 import { useQuery } from "@tanstack/react-query";
-
-const FROGGYS_PARENT_HASH = "3388f08d493392bcd5b63aa6f1152c29fa11ab28dd1e730cba6b3c16415c00e2";
 
 async function fetchFroggys({ address, inscriptionId }: { address?: string; inscriptionId?: number }) {
   if (address) {

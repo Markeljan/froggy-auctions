@@ -1,3 +1,4 @@
+import { AppNetwork } from "@/app/config";
 import { froggyData } from "@/lib/froggy-data";
 import toast from "react-hot-toast";
 
@@ -26,13 +27,34 @@ export function tokenIdToInscriptionId(tokenId: number) {
   })?.inscriptionId;
 }
 
-export function getExplorerUrl(txid: string, network: string) {
+export function getExplorerUrl(txid: string, network: AppNetwork) {
   switch (network) {
     case "devnet":
       return `http://localhost:8000/txid/${txid}?chain=testnet&api=http://localhost:3999`;
-    case "testnet":
-      return `https://explorer.hiro.so/txid/${txid}?chain=testnet`;
     default:
       return `https://explorer.hiro.so/txid/${txid}?chain=mainnet`;
   }
 }
+
+export const validateFroggysMemo = (memo: string) => {
+  // require to start with "t"
+  if (memo[0] !== "t") return false;
+
+  // require the rest of the memo to be a number
+  const restAsNumber = parseInt(memo.slice(1));
+  if (isNaN(restAsNumber)) return false;
+
+  // require the memotAsT
+  const restAsTokenId = inscriptionIdToTokenId(restAsNumber);
+  if (!restAsTokenId) return false;
+
+  return true;
+};
+
+export const getInscriptionIdFromMemo = (memo: string) => {
+  const inscriptionId = parseInt(memo.slice(1));
+  if (isNaN(inscriptionId)) {
+    return null;
+  }
+  return inscriptionId;
+};

@@ -1,49 +1,46 @@
-import { NextResponse } from "next/server";
-import { SignedContractCallOptions, makeContractCall, principalCV, uintCV } from "@stacks/transactions";
-import { broadcastTransaction, AnchorMode } from "@stacks/transactions";
-import { FROGGY_CONTRACT_ADDRESS_DEVNET, network } from "@/app/config";
+import { NextRequest, NextResponse } from "next/server";
+import { cvToString, deserializeCV } from "@stacks/transactions";
+import { FROGGY_AGENT_ADDRESS, transactionsApi } from "@/app/config";
+import { FroggyHop, FroggyHopTransaction } from "@/lib/types";
+import { getInscriptionIdFromMemo, validateFroggysMemo } from "@/lib/utils/misc";
+import { saveFroggyHop } from "@/app/actions";
 
-const senderKey = process.env.DEPLOYER_PRIVATE_KEY;
-
-type HopArgs = {
-  tokenId: number;
-  recipient: string;
-};
-
-export async function POST(request: Request): Promise<NextResponse> {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   const data = await request.json();
+  const { txid } = data as { txid: string };
 
-  const { tokenId, recipient } = data as HopArgs;
+  const tx = (await transactionsApi.getTransactionById({ txId: txid })) as FroggyHopTransaction;
 
-  if (!senderKey) {
-    console.error("DEPLOYER_PRIVATE_KEY is not set");
-    return NextResponse.json({ error: "DEPLOYER_PRIVATE_KEY is not set" }, { status: 400 });
+  if (!tx) {
+    return NextResponse.json({ error: "Transaction not found" }, { status: 404 });
   }
 
-  const txOptions: SignedContractCallOptions = {
-    anchorMode: AnchorMode.Any,
-    contractAddress: FROGGY_CONTRACT_ADDRESS_DEVNET,
-    functionName: "hop",
-    functionArgs: [uintCV(tokenId), principalCV(recipient)],
-    contractName: "Froggys",
-    senderKey: senderKey,
-    network: network,
-  };
+  const recipient = tx?.token_transfer?.recipient_address;
+  const serializedMemo = tx?.token_transfer?.memo;
 
-  try {
-    const transaction = await makeContractCall(txOptions);
-    console.log("transaction:", transaction);
-    const broadcastResponse = await broadcastTransaction(transaction, network);
-    console.log("broadcastResponse:", broadcastResponse);
-    const { txid, error, reason, reason_data } = broadcastResponse;
-    if (error) {
-      console.error("Failed to hop", error, reason, reason_data);
-      return NextResponse.json({ error, reason, reason_data }, { status: 400 });
-    }
-    console.log("Hopped", txid);
-    return NextResponse.json({ txid }, { status: 200 });
-  } catch (error) {
-    console.error("Failed to hop", error);
-    return NextResponse.json({ error: error }, { status: 500 });
+  const memo = cvToString(deserializeCV(serializedMemo));
+  const isValidMemo = validateFroggysMemo(memo);
+
+  const inscriptionId = getInscriptionIdFromMemo(memo);
+
+  const isValidHop = recipient === FROGGY_AGENT_ADDRESS && isValidMemo && inscriptionId;
+
+  if (!isValidHop) {
+    return NextResponse.json({ error: "Not a valid Froggys" }, { status: 400 });
   }
+
+  const froggyHop = {
+    txid,
+    sender: tx.sender_address,
+    recipient,
+    memo,
+    inscriptionId,
+    txStatus: tx.tx_status,
+    hopStatus: "pending",
+  } as FroggyHop;
+
+  // push the hop to db
+  await saveFroggyHop(JSON.stringify(froggyHop));
+
+  return NextResponse.json({ txid }, { status: 200 });
 }

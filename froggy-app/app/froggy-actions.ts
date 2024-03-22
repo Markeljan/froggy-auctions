@@ -7,9 +7,9 @@ import {
   uintCV,
 } from "@stacks/transactions";
 import { broadcastTransaction, AnchorMode } from "@stacks/transactions";
-import { FROGGY_CONTRACT_ADDRESS_DEVNET, network } from "@/app/config";
+import { FROGGY_CONTRACT_ADDRESS, network } from "@/app/config";
 
-const senderKey = process.env.DEPLOYER_PRIVATE_KEY;
+const senderKey = process.env.FROGGY_AGENT_KEY;
 
 type FormState =
   | {
@@ -21,7 +21,7 @@ type FormState =
 export const hop = async (formState: FormState, formData: FormData) => {
   console.log("formData:", formData);
   if (!senderKey) {
-    console.error("DEPLOYER_PRIVATE_KEY is not set");
+    console.error("FROGGY_AGENT_KEY is not set");
     return { txid: "" };
   }
 
@@ -31,10 +31,10 @@ export const hop = async (formState: FormState, formData: FormData) => {
   const txOptions: SignedContractCallOptions = {
     anchorMode: AnchorMode.Any,
     network: network,
-    contractAddress: FROGGY_CONTRACT_ADDRESS_DEVNET,
+    contractAddress: FROGGY_CONTRACT_ADDRESS,
     functionName: "hop",
     functionArgs: [uintCV(tokenId), principalCV(recipient)],
-    contractName: "Froggys",
+    contractName: "froggys",
     senderKey: senderKey,
   };
 

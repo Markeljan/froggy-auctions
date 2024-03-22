@@ -18,6 +18,31 @@ export async function getSordEvents() {
   }
 }
 
+export async function saveFroggyHop(data: string) {
+  try {
+    await kv.lpush("froggy-hop", data);
+  } catch (error) {
+    console.error("Failed to save froggy hop transaction", error);
+  }
+}
+
+export async function updateFroggyByIndex(index: number, data: string) {
+  try {
+    await kv.lset("froggy-hop", index, data);
+  } catch (error) {
+    console.error("Failed to update froggy hop transaction", error);
+  }
+}
+
+export async function getFroggyHops() {
+  try {
+    const hops = await kv.lrange("froggy-hop", 0, -1);
+    return hops;
+  } catch (error) {
+    console.error("Failed to get froggy hop transactions", error);
+  }
+}
+
 const colors = ["#7dd3fc", "#f9a8d4", "#86efac", "#fde047", "#fca5a5", "#c4b5fd", "#93c5fd", "#a5b4fc", "#c4b5fd"];
 
 const getRandomColor = () => {
@@ -38,4 +63,3 @@ export const generateBoxGridData = () => {
     })
   );
 };
-

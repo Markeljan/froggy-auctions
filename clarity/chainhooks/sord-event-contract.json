@@ -1,0 +1,25 @@
+{
+  "name": "froggy-hook-contract",
+  "uuid": "c71611b0-2ad4-4ca7-bb4a-999fe5bbe980",
+  "chain": "stacks",
+  "version": 1,
+  "networks": {
+    "mainnet": {
+      "if_this": {
+        "scope": "contract_call",
+        "method": "transfer-memo-single",
+        "contract_identifier": "SP1ZKR93HX7QC5VNE4H64QHX92XCCDPHMB803FKWC.sordinals-inscribe"
+      },
+      "end_block": null,
+      "then_that": {
+        "http_post": {
+          "url": "https://froggy-auction.xyz/api/sord-event",
+          "authorization_header": "Bearer CHAINHOOK_AUTH_KEY"
+        }
+      },
+      "start_block": 151380,
+      "decode_clarity_values": true,
+      "expire_after_occurrence": null
+    }
+  }
+}

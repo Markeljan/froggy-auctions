@@ -1,12 +1,11 @@
-export async function fetchHop({ tokenId, recipientAddress }: { tokenId: number; recipientAddress: string }) {
+export async function fetchHop({ txid }: { txid: string }) {
   const response = await fetch("/api/hop", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      tokenId: tokenId,
-      recipient: recipientAddress,
+      txid,
     }),
   });
 

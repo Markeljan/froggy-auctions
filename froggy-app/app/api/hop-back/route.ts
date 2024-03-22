@@ -9,10 +9,10 @@ import {
   uintCV,
 } from "@stacks/transactions";
 import { broadcastTransaction, AnchorMode } from "@stacks/transactions";
-import { FROGGY_CONTRACT_ADDRESS_DEVNET, network } from "@/app/config";
+import { FROGGY_CONTRACT_ADDRESS, network } from "@/app/config";
 import { tokenIdToInscriptionId } from "@/lib/utils/misc";
 
-const senderKey = process.env.DEPLOYER_PRIVATE_KEY;
+const senderKey = process.env.FROGGY_AGENT_KEY;
 
 type HopArgs = {
   tokenId: number;
@@ -25,8 +25,8 @@ export async function POST(request: Request): Promise<NextResponse> {
   const { tokenId, recipient } = data as HopArgs;
 
   if (!senderKey) {
-    console.error("DEPLOYER_PRIVATE_KEY is not set");
-    return NextResponse.json({ error: "DEPLOYER_PRIVATE_KEY is not set" }, { status: 400 });
+    console.error("FROGGY_AGENT_KEY is not set");
+    return NextResponse.json({ error: "FROGGY_AGENT_KEY is not set" }, { status: 400 });
   }
 
   const senderAddress = getAddressFromPrivateKey(senderKey, network.version);
@@ -35,10 +35,10 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const txOptions: SignedContractCallOptions = {
     anchorMode: AnchorMode.Any,
-    contractAddress: FROGGY_CONTRACT_ADDRESS_DEVNET,
+    contractAddress: FROGGY_CONTRACT_ADDRESS,
     functionName: "hop-back",
     functionArgs: [uintCV(tokenId)],
-    contractName: "Froggys",
+    contractName: "froggys",
     senderKey: senderKey,
     network: network,
     nonce: nonce,

@@ -1,21 +1,30 @@
-import { StacksDevnet } from "@stacks/network";
-import { Configuration } from "@stacks/blockchain-api-client";
+import { StacksMainnet, StacksDevnet, createApiKeyMiddleware, createFetchFn } from "@stacks/network";
+import { Configuration, SmartContractsApi, TransactionsApi } from "@stacks/blockchain-api-client";
 
-export const network = new StacksDevnet();
-export const FROGGY_AGENT_ADDRESS_MAINNET = "SP246BNY0D1H2J2WMXMXEZVHH5J8CBG10XA17YEMD";
-export const FROGGY_AGENT_ADDRESS_TESTNET = "ST246BNY0D1H2J2WMXMXEZVHH5J8CBG10X9P2C6N3";
-export const FROGGY_AGENT_ADDRESS_DEVNET = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM";
+export type AppNetwork = "mainnet" | "devnet";
 
-export const FROGGY_CONTRACT_ADDRESS_DEVNET = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM";
-
-export const FROGGY_AUCTIONS_CONTRACT_ADDRESS_DEVNET = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM";
-
+export const APP_NETWORK = `${process.env.NEXT_PUBLIC_APP_NETWORK}` as AppNetwork;
 export const APP_URL = `${process.env.NEXT_PUBLIC_APP_URL}`;
 const HIRO_API_KEY = `${process.env.NEXT_PUBLIC_HIRO_API_KEY}`;
 
+export const FROGGY_AGENT_ADDRESS =
+  APP_NETWORK === "mainnet" ? "SP246BNY0D1H2J2WMXMXEZVHH5J8CBG10XA17YEMD" : "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM";
+export const FROGGY_CONTRACT_ADDRESS =
+  APP_NETWORK === "mainnet" ? "SP25661F2PHYBS56DF2KKEWDQSA53ABNFW8GKQTTC" : "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM";
+export const FROGGY_AUCTIONS_CONTRACT_ADDRESS =
+  APP_NETWORK === "mainnet" ? "SP25661F2PHYBS56DF2KKEWDQSA53ABNFW8GKQTTC" : "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM";
+  
+export const FROGGYS_PARENT_HASH = "3388f08d493392bcd5b63aa6f1152c29fa11ab28dd1e730cba6b3c16415c00e2";
+
+const apiMiddleware = createApiKeyMiddleware({ apiKey: HIRO_API_KEY });
+const apiFetchFn = createFetchFn(apiMiddleware);
 export const apiConfig: Configuration = new Configuration({
-  fetchApi: (req: Request, config) =>
-    fetch(req, { ...config, headers: { ...config?.headers, "x-hiro-api-key": HIRO_API_KEY } }),
-  // for mainnet, replace `testnet` with `mainnet`
-  basePath: "http://localhost:3999",
+  apiKey: HIRO_API_KEY,
 });
+
+export const network =
+  APP_NETWORK === "mainnet" ? new StacksMainnet({ fetchFn: apiFetchFn }) : new StacksDevnet({ fetchFn: apiFetchFn });
+
+// initiate a transactionInterface
+export const transactionsApi = new TransactionsApi(apiConfig);
+export const smartContractsApi = new SmartContractsApi(apiConfig);

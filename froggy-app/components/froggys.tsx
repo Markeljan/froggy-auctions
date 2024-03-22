@@ -8,7 +8,7 @@ import { VscLoading } from "react-icons/vsc";
 import { useIsClient } from "@/lib/hooks/use-is-client";
 import { useChainhooksQuery } from "@/lib/api/use-chainhooks-query";
 import toast from "react-hot-toast";
-import { shortenAddress } from "@/lib/utils/misc";
+import { inscriptionIdToTokenId, shortenAddress } from "@/lib/utils/misc";
 
 export const Froggys = ({ onChange }: { onChange: (value: string) => void }) => {
   const isClient = useIsClient();
@@ -69,7 +69,7 @@ export const Froggys = ({ onChange }: { onChange: (value: string) => void }) => 
               onChange(froggy.id);
             }}
             className="max-w-[150px] w-full mx-auto cursor-pointer "
-            imageUrl={`/frogs/${froggy.id}.png`}
+            imageUrl={`/frogs/${inscriptionIdToTokenId(Number(froggy.id))}.png`}
             key={index}
           >
             {froggy.id}

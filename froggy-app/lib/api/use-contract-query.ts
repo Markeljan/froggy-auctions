@@ -1,15 +1,9 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import {
-  ReadOnlyFunctionSuccessResponse,
-  SmartContractsApi,
-  SmartContractsApiInterface,
-} from "@stacks/blockchain-api-client";
-import { FROGGY_AGENT_ADDRESS_DEVNET, apiConfig } from "@/app/config";
+import { ReadOnlyFunctionSuccessResponse } from "@stacks/blockchain-api-client";
+import { FROGGY_AGENT_ADDRESS, apiConfig, smartContractsApi } from "@/app/config";
 import { uintCV, cvToHex, hexToCV, cvToValue } from "@stacks/transactions";
-
-const contractsApi: SmartContractsApiInterface = new SmartContractsApi(apiConfig);
 
 type ReadContractArgs = {
   contractAddress: string;
@@ -29,12 +23,12 @@ async function readContract({ contractAddress, contractName, functionName, funct
       }
     }) || [];
 
-  const fnCall: ReadOnlyFunctionSuccessResponse = await contractsApi.callReadOnlyFunction({
+  const fnCall: ReadOnlyFunctionSuccessResponse = await smartContractsApi.callReadOnlyFunction({
     contractAddress,
     contractName,
     functionName,
     readOnlyFunctionArgs: {
-      sender: FROGGY_AGENT_ADDRESS_DEVNET,
+      sender: FROGGY_AGENT_ADDRESS,
       arguments: functionArgsCV,
     },
   });
