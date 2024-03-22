@@ -51,6 +51,37 @@ export type FroggyHopTransaction = {
   };
 };
 
+export type FroggyHopContractCall = {
+  tx_id: string;
+  nonce: number;
+  fee_rate: string;
+  sender_address: string;
+  sponsored: boolean;
+  post_condition_mode: string;
+  post_conditions: {
+    type: string;
+    condition_code: string;
+    amount: string;
+    principal: { type_id: string; address: string };
+  }[];
+  anchor_mode: string;
+  tx_status: string;
+  receipt_time: number;
+  receipt_time_iso: string;
+  tx_type: string;
+  contract_call: {
+    contract_id: string;
+    function_name: string;
+    function_signature: string;
+    function_args: {
+      hex: string;
+      repr: string;
+      name: string;
+      type: string;
+    }[];
+  };
+};
+
 export type FroggyHop = {
   txid: string;
   sender: string;
@@ -59,4 +90,30 @@ export type FroggyHop = {
   inscriptionId: number;
   txStatus: string;
   hopStatus: "pending" | "completed" | "failed";
+};
+
+export type SordinalsFroggyData = {
+  id: string;
+  type: string;
+  inscriptionHash: string;
+  minter: string;
+  owner: string;
+  createdTxId: string;
+  createdBlockHash: string;
+  createdBlockHeight: string;
+  txTime: string;
+  parentHash: string;
+  metadata: null;
+  chainContentType: string;
+  chainContentEncoding: string;
+  contentType: string;
+  contentEncoding: string;
+  txFee: string;
+  creationTime: string;
+  updateTime: string;
+  fileName: string;
+  fileSize: string;
+  externalData: { type: string };
+  isNsfw: boolean;
+  fileUrl: string;
 };

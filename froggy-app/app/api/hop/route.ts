@@ -1,35 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
-import { FROGGY_AGENT_ADDRESS, transactionsApi } from "@/app/config";
-import { FroggyHop, FroggyHopTransaction } from "@/lib/types";
-import { validateFroggysMemo } from "@/lib/utils/misc";
+import { FROGGY_AGENT_ADDRESS, SORDINALS_CONTRACT_ADDRESS, transactionsApi } from "@/app/config";
+import { FroggyHop, FroggyHopContractCall } from "@/lib/types";
+import { inscriptionHashToTokenId } from "@/lib/utils/misc";
 import { saveFroggyHop } from "@/app/actions";
+
+const TRANSFER_PREFIX = "0x74";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const data = await request.json();
   const { txid } = data as { txid: string };
 
-  const tx = (await transactionsApi.getTransactionById({ txId: txid })) as FroggyHopTransaction;
+  const tx = (await transactionsApi.getTransactionById({ txId: txid })) as FroggyHopContractCall;
 
   if (!tx) {
     return NextResponse.json({ error: "Transaction not found" }, { status: 404 });
   }
 
-  const recipient = tx?.token_transfer?.recipient_address;
-  const serializedMemo = tx?.token_transfer?.memo;
+  const contractAddress = tx?.contract_call?.contract_id?.split(".")[0];
+  const contractFunctionName = tx?.contract_call?.function_name;
 
-  const cleanHexString = serializedMemo.startsWith("0x") ? serializedMemo.slice(2) : serializedMemo;
-  const buffer = Buffer.from(cleanHexString, "hex");
-  const memo = buffer.toString("utf-8");
-  const isValidMemo = validateFroggysMemo(memo);
-
-  const inscriptionId = parseInt(memo.slice(1));
-  if (isNaN(inscriptionId)) {
-    return NextResponse.json({ error: "Invalid inscriptionId" }, { status: 400 });
+  if (contractAddress !== SORDINALS_CONTRACT_ADDRESS || contractFunctionName !== "transfer-memo-single") {
+    return NextResponse.json({ error: "Invalid contract" }, { status: 400 });
   }
-  const isValidHop = recipient === FROGGY_AGENT_ADDRESS && isValidMemo && inscriptionId;
 
-  if (!isValidHop) {
-    return NextResponse.json({ error: "Not a valid Froggys" }, { status: 400 });
+  // recipient is the agent address SP246BNY0D1H2J2WMXMXEZVHH5J8CBG10XA17YEMD
+  const recipient = tx?.contract_call?.function_args[0]?.repr.split("'")[1];
+
+  if (recipient !== FROGGY_AGENT_ADDRESS) {
+    return NextResponse.json({ error: "Invalid recipient" }, { status: 400 });
+  }
+
+  const memo = tx?.contract_call?.function_args[1]?.repr;
+
+  if (!memo?.startsWith(TRANSFER_PREFIX)) {
+    return NextResponse.json({ error: "Invalid memo" }, { status: 400 });
+  }
+  const inscriptionHashFromMemo = memo.slice(TRANSFER_PREFIX.length);
+  const inscriptionId = inscriptionHashToTokenId(inscriptionHashFromMemo);
+  if (!inscriptionId) {
+    return NextResponse.json({ error: "Invalid inscriptionId" }, { status: 400 });
   }
 
   const froggyHop = {
