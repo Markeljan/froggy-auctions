@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cvToString, deserializeCV } from "@stacks/transactions";
 import { FROGGY_AGENT_ADDRESS, transactionsApi } from "@/app/config";
 import { FroggyHop, FroggyHopTransaction } from "@/lib/types";
-import { getInscriptionIdFromMemo, validateFroggysMemo } from "@/lib/utils/misc";
+import { validateFroggysMemo } from "@/lib/utils/misc";
 import { saveFroggyHop } from "@/app/actions";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
@@ -18,11 +17,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const recipient = tx?.token_transfer?.recipient_address;
   const serializedMemo = tx?.token_transfer?.memo;
 
-  const memo = cvToString(deserializeCV(serializedMemo));
+  const cleanHexString = serializedMemo.startsWith("0x") ? serializedMemo.slice(2) : serializedMemo;
+  const buffer = Buffer.from(cleanHexString, "hex");
+  const memo = buffer.toString("utf-8");
   const isValidMemo = validateFroggysMemo(memo);
 
-  const inscriptionId = getInscriptionIdFromMemo(memo);
-
+  const inscriptionId = parseInt(memo.slice(1));
+  if (isNaN(inscriptionId)) {
+    return NextResponse.json({ error: "Invalid inscriptionId" }, { status: 400 });
+  }
   const isValidHop = recipient === FROGGY_AGENT_ADDRESS && isValidMemo && inscriptionId;
 
   if (!isValidHop) {

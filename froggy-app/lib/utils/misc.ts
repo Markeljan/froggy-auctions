@@ -27,6 +27,14 @@ export function tokenIdToInscriptionId(tokenId: number) {
   })?.inscriptionId;
 }
 
+export function tokenIdToInscriptionHash(tokenId: number) {
+  return froggyData.find((froggy) => {
+    if (froggy.id === tokenId) {
+      return froggy.inscriptionHash;
+    }
+  })?.inscriptionHash;
+}
+
 export function getExplorerUrl(txid: string, network: AppNetwork) {
   switch (network) {
     case "devnet":
@@ -49,12 +57,4 @@ export const validateFroggysMemo = (memo: string) => {
   if (!restAsTokenId) return false;
 
   return true;
-};
-
-export const getInscriptionIdFromMemo = (memo: string) => {
-  const inscriptionId = parseInt(memo.slice(1));
-  if (isNaN(inscriptionId)) {
-    return null;
-  }
-  return inscriptionId;
 };

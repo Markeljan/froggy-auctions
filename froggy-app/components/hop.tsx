@@ -7,7 +7,12 @@ import Input from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useConnect } from "@stacks/connect-react";
 import { APP_NETWORK, FROGGY_AGENT_ADDRESS, FROGGY_CONTRACT_ADDRESS, network } from "@/app/config";
-import { getExplorerUrl, inscriptionIdToTokenId, tokenIdToInscriptionId } from "@/lib/utils/misc";
+import {
+  getExplorerUrl,
+  inscriptionIdToTokenId,
+  tokenIdToInscriptionHash,
+  tokenIdToInscriptionId,
+} from "@/lib/utils/misc";
 import { useFroggysQuery } from "@/lib/api/use-froggys-query";
 import {
   AnchorMode,
@@ -17,6 +22,10 @@ import {
   createSTXPostCondition,
   createNonFungiblePostCondition,
   uintCV,
+  bufferCV,
+  createMemoString,
+  hexToCV,
+  cvToString,
 } from "@stacks/transactions";
 import { useReadContract } from "@/lib/api/use-contract-query";
 import toast from "react-hot-toast";
@@ -49,11 +58,16 @@ export const Hop = () => {
     event.preventDefault();
     if (!userAddress || !tokenId) return;
 
+    const hexString = Buffer.from("t").toString("hex") + tokenIdToInscriptionHash(tokenId);
+    const memo = Buffer.from(hexString, "hex");
+    const memoCV = bufferCV(memo);
+    const memoCVString = cvToString(memoCV);
+
     // user sends froggy to FROGGY_AGENT_ADDRESS
     await doSTXTransfer({
       recipient: FROGGY_AGENT_ADDRESS,
       amount: 1n,
-      memo: `t${inscriptionId}`,
+      memo: memoCVString,
       network: network,
       onCancel: () => {
         toast("Transaction cancelled", { icon: "🚫" });
