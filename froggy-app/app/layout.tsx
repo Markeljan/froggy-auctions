@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Archivo } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "@/app/globals.css";
 import { QueryProvider } from "@/components/query-provider";
 import { Toaster } from "react-hot-toast";
 import { UserSessionProvider } from "@/app/context";
 import { APP_URL } from "@/app/config";
 
-const archivo = Archivo({ subsets: ["latin"], weight:["400", "600", "700"] });
+const archivo = Archivo({ subsets: ["latin"], weight: ["400", "600", "700"] });
 
 export const metadata: Metadata = {
   title: "Froggy Auctions",
@@ -48,6 +49,7 @@ export default function RootLayout({
             },
           }}
         />
+        <Analytics />
         <QueryProvider>
           <UserSessionProvider>{children}</UserSessionProvider>
         </QueryProvider>
