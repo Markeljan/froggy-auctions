@@ -23,15 +23,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Invalid contract" }, { status: 400 });
   }
 
-  // recipient is the agent address SP246BNY0D1H2J2WMXMXEZVHH5J8CBG10XA17YEMD
   const recipient = tx?.contract_call?.function_args[0]?.repr.split("'")[1];
-
   if (recipient !== FROGGY_AGENT_ADDRESS) {
     return NextResponse.json({ error: "Invalid recipient" }, { status: 400 });
   }
 
   const memo = tx?.contract_call?.function_args[1]?.repr;
-
   if (!memo?.startsWith(TRANSFER_PREFIX)) {
     return NextResponse.json({ error: "Invalid memo" }, { status: 400 });
   }
@@ -52,7 +49,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   } as FroggyHop;
 
   // push the hop to db
-  await saveFroggyHop(JSON.stringify(froggyHop));
+  await saveFroggyHop(froggyHop);
 
   return NextResponse.json({ txid }, { status: 200 });
 }

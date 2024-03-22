@@ -9,7 +9,7 @@ import {
   transactionsApi,
 } from "@/app/config";
 import { getFroggyHops, updateFroggyByIndex } from "@/app/actions";
-import { FroggyHop, FroggyHopTransaction } from "@/lib/types";
+import { FroggyHopTransaction } from "@/lib/types";
 import { tokenIdToInscriptionId } from "@/lib/utils/misc";
 
 const FROGGY_AGENT_KEY = `${process.env.FROGGY_AGENT_KEY}`;
@@ -26,8 +26,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const hopListRaw = await getFroggyHops();
-  const hopList = hopListRaw?.map((hop) => JSON.parse(hop) as FroggyHop);
+  const hopList = await getFroggyHops();
   if (!hopList || hopList.length === 0) {
     return NextResponse.json({ message: "No hops to execute" }, { status: 200 });
   }
@@ -100,7 +99,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       hop.txid = txid;
 
       // update froggy by the index
-      await updateFroggyByIndex(hopList.indexOf(hop), JSON.stringify(hop));
+      await updateFroggyByIndex(hopList.indexOf(hop), hop);
 
       return NextResponse.json({ txid }, { status: 200 });
     } catch (error) {

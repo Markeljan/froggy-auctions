@@ -1,5 +1,6 @@
 import { kv } from "@vercel/kv";
 import { froggyData } from "@/lib/froggy-data";
+import { FroggyHop } from "@/lib/types";
 
 export async function saveSordEvent(data: string) {
   try {
@@ -18,15 +19,15 @@ export async function getSordEvents() {
   }
 }
 
-export async function saveFroggyHop(data: string) {
+export async function saveFroggyHop(data: FroggyHop) {
   try {
-    await kv.lpush("froggy-hop", data);
+    await kv.lpush<FroggyHop>("froggy-hop", data);
   } catch (error) {
     console.error("Failed to save froggy hop transaction", error);
   }
 }
 
-export async function updateFroggyByIndex(index: number, data: string) {
+export async function updateFroggyByIndex(index: number, data: FroggyHop) {
   try {
     await kv.lset("froggy-hop", index, data);
   } catch (error) {
@@ -36,7 +37,7 @@ export async function updateFroggyByIndex(index: number, data: string) {
 
 export async function getFroggyHops() {
   try {
-    const hops = await kv.lrange("froggy-hop", 0, -1);
+    const hops = await kv.lrange<FroggyHop>("froggy-hop", 0, -1);
     return hops;
   } catch (error) {
     console.error("Failed to get froggy hop transactions", error);
