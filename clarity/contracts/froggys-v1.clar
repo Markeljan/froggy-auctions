@@ -1,14 +1,32 @@
 ;; froggys
 
-;; (impl-trait 'SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait.nft-trait)
-(impl-trait .nft-trait.nft-trait)
+;; Who are Froggys? 
+
+;; The fact that this is the first 10k sOrdinals collection is purely anecdotical. We will build something magical together. 
+
+;; Inside every Degen there's a kid that wants to come out. 
+
+;; Think "The Little Prince" meets "Crypto Degens"
+
+;; Our community will be a blend of the daring and the dreamy, where risk-taking meets reflection, and innovation meets introspection. 
+;; Let's embark on this journey together, with the wisdom of The Little Prince guiding our Degen spirits.
+
+;; The 10k Froggys are 6x6 pixels, children of sOrdinal Inscription #2793
+;; All Froggys were inscribed before 100k inscriptions existed in the sOrdinals Protocol - ranging from #10065 to #87643
+
+;; Special thanks to Gamma devs and Cirrotoshi for proofing the first froggy inscription wrapper on Stacks. We appreciate Gamma, Stacks, and Bitcoin!
+;; Special thanks to Mijoco.btc, aka @Radicleart, for promptly reviewing the hop and hop-back functions.
+;; To go far, go together. Hop Hop!
+
+(impl-trait 'SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait.nft-trait)
+;; (impl-trait .nft-trait.nft-trait)
 
 (define-non-fungible-token froggys uint)
 
 ;; Constants
 (define-constant DEPLOYER tx-sender)
 (define-constant COMM u1000)
-(define-constant COMM-ADDR 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-constant COMM-ADDR 'SP25661F2PHYBS56DF2KKEWDQSA53ABNFW8GKQTTC)
 
 (define-constant ERR-NOT-AUTHORIZED u104)
 (define-constant ERR-INVALID-USER u105)
@@ -19,12 +37,12 @@
 
 ;; Internal variables
 (define-data-var last-id uint u1)
-(define-data-var artist-address principal 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5)
-
-(define-data-var metadata-frozen bool false)(define-data-var ipfs-root (string-ascii 80) "ipfs://bafybeiggwtcx7xzd4g7l236xvd7xnv6t6flj4dp3lgq57ienaib2urs2vq/")
+(define-data-var artist-address principal 'SP3E8B51MF5E28BD82FM95VDSQ71VK4KFNZX7ZK2R)
+(define-data-var ipfs-root (string-ascii 80) "ipfs://bafybeiggwtcx7xzd4g7l236xvd7xnv6t6flj4dp3lgq57ienaib2urs2vq/")
+(define-data-var metadata-frozen bool false)
 
 (define-data-var gas-for-froggy uint u1000001)
-(define-data-var froggy-agent principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-data-var froggy-agent principal 'SP246BNY0D1H2J2WMXMXEZVHH5J8CBG10XA17YEMD)
 
 ;; A public function to update the froggy-agent variable
 (define-public (set-froggy-agent (new-agent principal))
@@ -52,11 +70,13 @@
 (define-public (burn (token-id uint))
   (begin 
     (asserts! (is-owner token-id tx-sender) (err ERR-NOT-AUTHORIZED))
+    ;; token-id must not be listed in the market
+    (try! (if (is-none (map-get? market token-id)) (ok true) (err ERR-LISTING)))
     (nft-burn? froggys token-id tx-sender)))
 
 (define-public (hop (token-id uint) (recipient principal)) 
  ;; Before calling this function
- ;; Agent verifies that the inscription 1.000001 was sent to them (DEPLOYER) by the recipient
+ ;; Agent verifies that the inscription 1.000001 was sent to them (DEPLOYER) by the recipient (1 or lower gas fees to cover for callint this func)
   (let 
     (
       (froggy-owner (nft-get-owner? froggys token-id)) ;; Was the token-id ever minted?
@@ -80,7 +100,7 @@
           ;; token-id must not be listed in the market
           (try! (if (is-none (map-get? market token-id)) (ok true) (err ERR-LISTING)))
           (print {expr: "hop", token-id: token-id, recipient: recipient})  
-          (trnsfr token-id tx-sender recipient) ;; and sends the NFT wrapper to the recipient
+          (as-contract (trnsfr token-id tx-sender recipient)) ;; and sends the NFT wrapper to the recipient
           )
     )
   )
@@ -89,7 +109,7 @@
 (define-public (hop-back (token-id uint))
   (begin   
     (asserts! (is-owner token-id contract-caller) (err ERR-NOT-AUTHORIZED)) ;; Mike says contract-caller to include a contract owning it
-    ;; Tx-sender must send Froggy-agent 1.000001 STX to cover for the inscription transfer
+    ;; Tx-sender must send froggy-agent 1.000001 STX to cover for the inscription transfer
     (try! (stx-transfer? (var-get gas-for-froggy) tx-sender (var-get froggy-agent)))
     ;; token-id must not be listed in the market
     (try! (if (is-none (map-get? market token-id)) (ok true) (err ERR-LISTING)))
@@ -158,8 +178,7 @@
             recipient
             (+ recipient-balance u1))
           (ok success))
-    error (err error))
-)
+    error (err error)))
 
 (define-private (is-sender-owner (id uint))
   (let ((owner (unwrap! (nft-get-owner? froggys id) false)))
@@ -193,3 +212,6 @@
     (map-delete market id)
     (print {a: "buy-in-ustx", id: id})
     (ok true)))
+
+;; It's an honor to have you as a friend. You are a kind person. You are a role model of a human being. And you are the creator of Froggys.
+;; Life was created so that we can hop, hop, auction, and hop back.
