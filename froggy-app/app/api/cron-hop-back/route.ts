@@ -94,7 +94,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       postConditions: [createSTXPostCondition(FROGGY_AGENT_ADDRESS, FungibleConditionCode.Equal, 1n)],
       senderKey: FROGGY_AGENT_KEY,
       network: network,
-      fee: 50000n, // 0.05 STX
+      fee: 100000n, // 0.10 STX
       nonce: nonce + BigInt(i),
     };
 
