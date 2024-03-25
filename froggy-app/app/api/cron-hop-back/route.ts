@@ -18,7 +18,7 @@ import {
   network,
   transactionsApi,
 } from "@/app/config";
-import { getFroggyHops, updateFroggyHopBackByIndex } from "@/app/actions";
+import { getFroggyHopBacks, getFroggyHops, updateFroggyHopBackByIndex } from "@/app/actions";
 import { FroggyHopTransaction } from "@/lib/types";
 import { inscriptionIdToTokenId } from "@/lib/utils/misc";
 
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const hopList = await getFroggyHops();
+  const hopList = await getFroggyHopBacks();
   if (!hopList || hopList.length === 0) {
     return NextResponse.json({ message: "No hops to execute" }, { status: 200 });
   }
@@ -46,6 +46,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const agentFroggys = sordinalsData?.data?.filter(
     (sord: { parentHash: string }) => sord.parentHash === FROGGYS_PARENT_HASH
   );
+
+  console.log("agentFroggys", agentFroggys);
 
   // get the nonce from the wallet
   const nonce = await getNonce(FROGGY_AGENT_ADDRESS, network);
