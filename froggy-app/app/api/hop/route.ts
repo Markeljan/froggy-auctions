@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { FROGGY_AGENT_ADDRESS, SORDINALS_CONTRACT_ADDRESS, transactionsApi } from "@/app/config";
 import { FroggyHop, FroggyHopContractCall } from "@/lib/types";
-import { inscriptionHashToTokenId } from "@/lib/utils/misc";
+import { inscriptionHashToInscriptionId } from "@/lib/utils/misc";
 import { saveFroggyHop } from "@/app/actions";
 
 const TRANSFER_PREFIX = "0x74";
@@ -32,9 +32,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   if (!memo?.startsWith(TRANSFER_PREFIX)) {
     return NextResponse.json({ error: "Invalid memo" }, { status: 400 });
   }
-  
+
   const inscriptionHashFromMemo = memo.slice(TRANSFER_PREFIX.length);
-  const inscriptionId = inscriptionHashToTokenId(inscriptionHashFromMemo);
+  const inscriptionId = inscriptionHashToInscriptionId(inscriptionHashFromMemo);
   if (!inscriptionId) {
     return NextResponse.json({ error: "Invalid inscriptionId" }, { status: 400 });
   }

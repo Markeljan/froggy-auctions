@@ -35,12 +35,12 @@ export function tokenIdToInscriptionHash(tokenId: number) {
   })?.inscriptionHash;
 }
 
-export function inscriptionHashToTokenId(inscriptionHash: string) {
+export function inscriptionHashToInscriptionId(inscriptionHash: string) {
   return froggyData.find((froggy) => {
     if (froggy.inscriptionHash === inscriptionHash) {
-      return froggy.id;
+      return froggy.inscriptionId;
     }
-  })?.id;
+  })?.inscriptionId;
 }
 
 export function getExplorerUrl(txid: string, network: AppNetwork) {

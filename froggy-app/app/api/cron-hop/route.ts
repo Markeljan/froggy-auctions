@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SignedContractCallOptions, makeContractCall, principalCV, uintCV } from "@stacks/transactions";
+import { SignedContractCallOptions, getNonce, makeContractCall, principalCV, uintCV } from "@stacks/transactions";
 import { broadcastTransaction, AnchorMode } from "@stacks/transactions";
 import {
   FROGGYS_PARENT_HASH,
@@ -37,17 +37,19 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     (sord: { parentHash: string }) => sord.parentHash === FROGGYS_PARENT_HASH
   );
 
-  console.log("agentFroggys:", agentFroggys);
-
+  // get the nonce from the wallet
+  const nonce = await getNonce(FROGGY_AGENT_ADDRESS, network);
+  const executedHops = [];
   // loop through the hops, until one is successfully executed
-  for (const hop of hopList) {
+  for (let i = 0; i < hopList.length; i++) {
+    const hop = hopList[i];
     const { inscriptionId, txStatus, hopStatus, recipient, txid, sender } = hop;
     if (hopStatus !== "pending") {
       continue;
     }
-    console.log("Executing hop for inscriptionId:", inscriptionId);
     // check if the froggy agent owns the froggy
-    const isFroggyHeldByAgent = agentFroggys?.some((sord: { id: string }) => parseInt(sord.id) === inscriptionId);
+
+    const isFroggyHeldByAgent = agentFroggys?.some((sord: { id: string }) => sord.id === inscriptionId.toString());
 
     if (!isFroggyHeldByAgent) {
       console.error(`Froggy not held by agent: ${inscriptionId}`);
@@ -81,19 +83,17 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       senderKey: FROGGY_AGENT_KEY,
       network: network,
       fee: 50000n, // 0.05 STX
+      nonce: nonce + BigInt(i),
     };
 
     try {
       const hopTransaction = await makeContractCall(txOptions);
-      console.log("transaction:", transaction);
       const broadcastResponse = await broadcastTransaction(hopTransaction, network);
-      console.log("broadcastResponse:", broadcastResponse);
       const { txid, error, reason, reason_data } = broadcastResponse;
       if (error) {
         console.error("Failed to hop", error, reason, reason_data);
         return NextResponse.json({ error, reason, reason_data }, { status: 400 });
       }
-      console.log("Hopped", txid);
       // update the hop status
       hop.hopStatus = "completed";
       hop.txStatus = transaction.tx_status;
@@ -101,12 +101,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
       // update froggy by the index
       await updateFroggyByIndex(hopList.indexOf(hop), hop);
-
-      return NextResponse.json({ txid }, { status: 200 });
+      executedHops.push(hop);
     } catch (error) {
       console.error("Failed to hop", error);
       return NextResponse.json({ error: error }, { status: 500 });
     }
+  }
+
+  if (executedHops.length > 0) {
+    return NextResponse.json({ executedHops }, { status: 200 });
   }
 
   return NextResponse.json({ message: "No hops executed" }, { status: 200 });
