@@ -196,9 +196,16 @@ export const Hop = () => {
           )}
         </div>
       </div>
-      <div className="flex flex-col gap-y-2 w-full mt-4 max-sm:px-0 px-8">
+      <div className="flex gap-y-2 w-full mt-4 max-sm:px-0 px-8 justify-between items-baseline">
         <p className="text-2xl">Owned Froggys</p>
+        <div className="flex space-x-4">
+          <div className="bg-[#C4A1FF] h-4 w-4 rounded-full" />
+          <div>sOrdinals</div>
+          <div className="bg-green-500 h-4 w-4 rounded-full" />
+          <div>SIP-009</div>
+        </div>
       </div>
+
       <Froggys onChange={(value) => setInputValue(value)} />
     </div>
   );
