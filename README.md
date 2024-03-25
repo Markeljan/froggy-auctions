@@ -1,6 +1,6 @@
 # Froggy Auctions
 
-Froggy Auctions showcases a way to interpoerate between the sOrdinals metaprotocol and Stacks native SIP-009 NFTs. 
+[froggy-auctions.xyz](https://stacks.gamma.io/collections/froggys) showcases a way to interpoerate between the sOrdinals metaprotocol and Stacks native SIP-009 NFTs.
 
 <img width="1726" alt="image" src="https://github.com/Markeljan/froggy-auctions/assets/12901349/6ee2a9be-e49a-4fac-9757-68685dd7245e">
 
@@ -36,5 +36,11 @@ A chainhook is used to track STX transfers with memos. After hitting our serverl
 
 ## Usage
 
-Currently the project is available for local development running a devnt with Clarinet with live mainnet deployments OTW.
+Try it out live on Stacks Mainnet at https://froggy-auctions.xyz
+
+## SIP-009 Wrapped Froggys on Gamma
+
+[Gamma Collection](https://stacks.gamma.io/collections/froggys)
+
+![image](https://github.com/Markeljan/froggy-auctions/assets/12901349/bdfd7932-94a2-4375-8f5d-b1ee32713e65)
 

@@ -7,18 +7,16 @@ import {
   getNonce,
   makeContractCall,
   principalCV,
-  uintCV,
 } from "@stacks/transactions";
 import { broadcastTransaction, AnchorMode } from "@stacks/transactions";
 import {
   FROGGYS_PARENT_HASH,
   FROGGY_AGENT_ADDRESS,
-  FROGGY_CONTRACT_ADDRESS,
   SORDINALS_CONTRACT_ADDRESS,
   network,
   transactionsApi,
 } from "@/app/config";
-import { getFroggyHops, updateFroggyHopBackByIndex } from "@/app/actions";
+import { getFroggyHopBacks, updateFroggyHopBackByIndex } from "@/app/actions";
 import { FroggyHopTransaction } from "@/lib/types";
 import { inscriptionIdToTokenId } from "@/lib/utils/misc";
 
@@ -36,12 +34,12 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const hopList = await getFroggyHops();
+  const hopList = await getFroggyHopBacks();
   if (!hopList || hopList.length === 0) {
     return NextResponse.json({ message: "No hops to execute" }, { status: 200 });
   }
 
-  const sordinalsResponse = await fetch(`https://api.sordinals.com/api/v1/inscriptions/owner/${FROGGY_AGENT_ADDRESS}`);
+  const sordinalsResponse = await fetch(`https://api.sordinals.com/api/v1/inscriptions/owner/${FROGGY_AGENT_ADDRESS}?limit=10000`);
   const sordinalsData = await sordinalsResponse.json();
   const agentFroggys = sordinalsData?.data?.filter(
     (sord: { parentHash: string }) => sord.parentHash === FROGGYS_PARENT_HASH
@@ -96,7 +94,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       postConditions: [createSTXPostCondition(FROGGY_AGENT_ADDRESS, FungibleConditionCode.Equal, 1n)],
       senderKey: FROGGY_AGENT_KEY,
       network: network,
-      fee: 50000n, // 0.05 STX
+      fee: 100000n, // 0.10 STX
       nonce: nonce + BigInt(i),
     };
 

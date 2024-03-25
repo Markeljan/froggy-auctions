@@ -10,6 +10,8 @@ import { useChainhooksQuery } from "@/lib/api/use-chainhooks-query";
 import toast from "react-hot-toast";
 import { inscriptionIdToTokenId, shortenAddress } from "@/lib/utils/misc";
 import { SordinalsFroggyData } from "@/lib/types";
+import { cn } from "@/lib/utils/cn";
+import { FROGGY_AGENT_ADDRESS } from "@/app/config";
 
 export const Froggys = ({ onChange }: { onChange: (value: string) => void }) => {
   const isClient = useIsClient();
@@ -67,12 +69,14 @@ export const Froggys = ({ onChange }: { onChange: (value: string) => void }) => 
           <VscLoading className="animate-spin w-full h-full" />
         </div>
       ) : (
-        data?.map((froggy: { id: string }, index: number) => (
+        data?.map((froggy: SordinalsFroggyData, index: number) => (
           <ImageCard
             onClick={() => {
               onChange(froggy.id);
             }}
-            className="max-w-[150px] w-full mx-auto cursor-pointer "
+            className={cn("max-w-[150px] w-full mx-auto cursor-pointer", {
+              "bg-green-500": froggy.owner === FROGGY_AGENT_ADDRESS,
+            })}
             imageUrl={`/frogs/${inscriptionIdToTokenId(Number(froggy.id))}.png`}
             key={index}
           >

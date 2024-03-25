@@ -31,7 +31,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ message: "No hops to execute" }, { status: 200 });
   }
 
-  const sordinalsResponse = await fetch(`https://api.sordinals.com/api/v1/inscriptions/owner/${FROGGY_AGENT_ADDRESS}`);
+  const sordinalsResponse = await fetch(`https://api.sordinals.com/api/v1/inscriptions/owner/${FROGGY_AGENT_ADDRESS}?limit=10000`);
   const sordinalsData = await sordinalsResponse.json();
   const agentFroggys = sordinalsData?.data?.filter(
     (sord: { parentHash: string }) => sord.parentHash === FROGGYS_PARENT_HASH
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       contractName: "froggys",
       senderKey: FROGGY_AGENT_KEY,
       network: network,
-      fee: 50000n, // 0.05 STX
+      fee: 100000n, // 0.10 STX
       nonce: nonce + BigInt(i),
     };
 
