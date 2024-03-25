@@ -7,18 +7,16 @@ import {
   getNonce,
   makeContractCall,
   principalCV,
-  uintCV,
 } from "@stacks/transactions";
 import { broadcastTransaction, AnchorMode } from "@stacks/transactions";
 import {
   FROGGYS_PARENT_HASH,
   FROGGY_AGENT_ADDRESS,
-  FROGGY_CONTRACT_ADDRESS,
   SORDINALS_CONTRACT_ADDRESS,
   network,
   transactionsApi,
 } from "@/app/config";
-import { getFroggyHopBacks, getFroggyHops, updateFroggyHopBackByIndex } from "@/app/actions";
+import { getFroggyHopBacks, updateFroggyHopBackByIndex } from "@/app/actions";
 import { FroggyHopTransaction } from "@/lib/types";
 import { inscriptionIdToTokenId } from "@/lib/utils/misc";
 
@@ -46,8 +44,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const agentFroggys = sordinalsData?.data?.filter(
     (sord: { parentHash: string }) => sord.parentHash === FROGGYS_PARENT_HASH
   );
-
-  console.log("agentFroggys", agentFroggys);
 
   // get the nonce from the wallet
   const nonce = await getNonce(FROGGY_AGENT_ADDRESS, network);
