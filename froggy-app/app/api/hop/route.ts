@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { FROGGY_AGENT_ADDRESS, SORDINALS_CONTRACT_ADDRESS, transactionsApi } from "@/app/config";
 import { FroggyHop, FroggyHopContractCall } from "@/lib/types";
 import { inscriptionHashToInscriptionId } from "@/lib/utils/misc";
-import { saveFroggyHop } from "@/app/actions";
+import { getFroggyHops, saveFroggyHop } from "@/app/actions";
 
 const TRANSFER_PREFIX = "0x74";
 
@@ -53,4 +53,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   await saveFroggyHop(froggyHop);
 
   return NextResponse.json({ txid }, { status: 200 });
+}
+
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  const hopList = await getFroggyHops();
+  return NextResponse.json(hopList, { status: 200 });
 }
