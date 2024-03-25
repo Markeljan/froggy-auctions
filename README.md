@@ -36,5 +36,5 @@ A chainhook is used to track STX transfers with memos. After hitting our serverl
 
 ## Usage
 
-Currently the project is available for local development running a devnt with Clarinet with live mainnet deployments OTW.
+Try it out live on Stacks Mainnet at https://froggy-auctions.xyz
 
