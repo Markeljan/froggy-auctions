@@ -75,6 +75,7 @@ export const Hop = () => {
       functionName: "transfer-memo-single",
       functionArgs: [principalCV(FROGGY_AGENT_ADDRESS), memoCV],
       postConditions: [createSTXPostCondition(userAddress, FungibleConditionCode.Equal, 1n)],
+      fee: 50000,
       network: network,
       onCancel: () => {
         toast("Transaction cancelled", { icon: "🚫" });
@@ -123,6 +124,7 @@ export const Hop = () => {
       functionName: "hop-back",
       functionArgs: [uintCV(tokenId)],
       network: network,
+      fee: 50000,
       anchorMode: AnchorMode.Any,
       postConditions: [sendStxPostCondition, sendNftPostCondition],
       onCancel: () => {

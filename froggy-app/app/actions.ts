@@ -27,11 +27,27 @@ export async function saveFroggyHop(data: FroggyHop) {
   }
 }
 
-export async function updateFroggyByIndex(index: number, data: FroggyHop) {
+export async function saveFroggyHopBack(data: FroggyHop) {
+  try {
+    await kv.lpush<FroggyHop>("froggy-hop-back", data);
+  } catch (error) {
+    console.error("Failed to save froggy hop back transaction", error);
+  }
+}
+
+export async function updateFroggyHopByIndex(index: number, data: FroggyHop) {
   try {
     await kv.lset("froggy-hop", index, data);
   } catch (error) {
     console.error("Failed to update froggy hop transaction", error);
+  }
+}
+
+export async function updateFroggyHopBackByIndex(index: number, data: FroggyHop) {
+  try {
+    await kv.lset("froggy-hop-back", index, data);
+  } catch (error) {
+    console.error("Failed to update froggy hop back transaction", error);
   }
 }
 
@@ -41,6 +57,15 @@ export async function getFroggyHops() {
     return hops;
   } catch (error) {
     console.error("Failed to get froggy hop transactions", error);
+  }
+}
+
+export async function getFroggyHopBacks() {
+  try {
+    const hops = await kv.lrange<FroggyHop>("froggy-hop-back", 0, -1);
+    return hops;
+  } catch (error) {
+    console.error("Failed to get froggy hop back transactions", error);
   }
 }
 

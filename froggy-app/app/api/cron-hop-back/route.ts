@@ -1,14 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SignedContractCallOptions, getNonce, makeContractCall, principalCV, uintCV } from "@stacks/transactions";
+import {
+  FungibleConditionCode,
+  SignedContractCallOptions,
+  bufferCV,
+  createSTXPostCondition,
+  getNonce,
+  makeContractCall,
+  principalCV,
+  uintCV,
+} from "@stacks/transactions";
 import { broadcastTransaction, AnchorMode } from "@stacks/transactions";
 import {
   FROGGYS_PARENT_HASH,
   FROGGY_AGENT_ADDRESS,
   FROGGY_CONTRACT_ADDRESS,
+  SORDINALS_CONTRACT_ADDRESS,
   network,
   transactionsApi,
 } from "@/app/config";
-import { getFroggyHops, updateFroggyHopByIndex } from "@/app/actions";
+import { getFroggyHops, updateFroggyHopBackByIndex } from "@/app/actions";
 import { FroggyHopTransaction } from "@/lib/types";
 import { inscriptionIdToTokenId } from "@/lib/utils/misc";
 
@@ -47,8 +57,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     if (hopStatus !== "pending") {
       continue;
     }
-    // check if the froggy agent owns the froggy
 
+    // check if the froggy agent owns the froggy
     const isFroggyHeldByAgent = agentFroggys?.some((sord: { id: string }) => sord.id === inscriptionId.toString());
 
     if (!isFroggyHeldByAgent) {
@@ -73,13 +83,17 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       continue;
     }
 
+    const memoBuffer = Buffer.from(hop.memo, "hex");
+    const memoCV = bufferCV(memoBuffer);
+
     // execute the hop
     const txOptions: SignedContractCallOptions = {
       anchorMode: AnchorMode.Any,
-      contractAddress: FROGGY_CONTRACT_ADDRESS,
-      functionName: "hop",
-      functionArgs: [uintCV(tokenId), principalCV(sender)],
-      contractName: "froggys",
+      contractAddress: SORDINALS_CONTRACT_ADDRESS,
+      contractName: "sordinals-inscribe",
+      functionName: "transfer-memo-single",
+      functionArgs: [principalCV(hop.sender), memoCV],
+      postConditions: [createSTXPostCondition(FROGGY_AGENT_ADDRESS, FungibleConditionCode.Equal, 1n)],
       senderKey: FROGGY_AGENT_KEY,
       network: network,
       fee: 50000n, // 0.05 STX
@@ -91,7 +105,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       const broadcastResponse = await broadcastTransaction(hopTransaction, network);
       const { txid, error, reason, reason_data } = broadcastResponse;
       if (error) {
-        console.error("Failed to hop", error, reason, reason_data);
+        console.error("Failed to hopback", error, reason, reason_data);
         return NextResponse.json({ error, reason, reason_data }, { status: 400 });
       }
       // update the hop status
@@ -100,10 +114,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       hop.txid = txid;
 
       // update froggy by the index
-      await updateFroggyHopByIndex(hopList.indexOf(hop), hop);
+      await updateFroggyHopBackByIndex(hopList.indexOf(hop), hop);
       executedHops.push(hop);
     } catch (error) {
-      console.error("Failed to hop", error);
+      console.error("Failed to hopback", error);
       return NextResponse.json({ error: error }, { status: 500 });
     }
   }
@@ -112,5 +126,5 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ executedHops }, { status: 200 });
   }
 
-  return NextResponse.json({ message: "No hops executed" }, { status: 200 });
+  return NextResponse.json({ message: "No hopbacks executed" }, { status: 200 });
 }
