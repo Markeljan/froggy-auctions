@@ -6,12 +6,12 @@ import { FroggyHop, SordinalsFroggyData } from "@/lib/types";
 import { getHops } from "@/lib/api/get-hops";
 
 async function fetchFroggys({ address, inscriptionId }: { address?: string; inscriptionId?: number }) {
-  const response = await fetch(`https://api.sordinals.com/api/v1/inscriptions/owner/${FROGGY_AGENT_ADDRESS}`);
+  const response = await fetch(`https://api.sordinals.com/api/v1/inscriptions/owner/${FROGGY_AGENT_ADDRESS}?limit=10000`);
   const { data } = (await response.json()) as { data: SordinalsFroggyData[] };
   const agentFroggys = data?.filter((sord: { parentHash: string }) => sord.parentHash === FROGGYS_PARENT_HASH);
   const hopList = (await getHops()) as FroggyHop[];
   if (address) {
-    const response = await fetch(`https://api.sordinals.com/api/v1/inscriptions/owner/${address}`);
+    const response = await fetch(`https://api.sordinals.com/api/v1/inscriptions/owner/${address}?limit=10000`);
     const { data } = (await response.json()) as { data: SordinalsFroggyData[] };
     const froggys = data?.filter((sord: { parentHash: string }) => sord.parentHash === FROGGYS_PARENT_HASH);
     const userHoppedFroggys = hopList
