@@ -4,7 +4,7 @@ import { AccordionTabs } from "@/components/ui/accordian-tabs";
 import { Hop } from "@/components/hop";
 import { Auction } from "@/components/auction";
 import { About } from "@/components/about";
-import { generateBoxGridData } from "@/app/actions";
+import { generateBoxGridData } from "@/lib/utils/misc";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { Socials } from "@/components/socials";

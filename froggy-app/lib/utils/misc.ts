@@ -11,36 +11,17 @@ export async function copyToClipboard(text: string) {
   toast("Copied to clipboard", { icon: "📋" });
 }
 
-export function inscriptionIdToTokenId(inscriptionId: number) {
-  return froggyData.find((froggy) => {
-    if (froggy.inscriptionId === inscriptionId) {
-      return froggy.id;
-    }
-  })?.id;
-}
-
-export function tokenIdToInscriptionId(tokenId: number) {
-  return froggyData.find((froggy) => {
-    if (froggy.id === tokenId) {
-      return froggy.inscriptionId;
-    }
-  })?.inscriptionId;
-}
-
-export function tokenIdToInscriptionHash(tokenId: number) {
-  return froggyData.find((froggy) => {
-    if (froggy.id === tokenId) {
-      return froggy.inscriptionHash;
-    }
-  })?.inscriptionHash;
-}
-
-export function inscriptionHashToInscriptionId(inscriptionHash: string) {
-  return froggyData.find((froggy) => {
-    if (froggy.inscriptionHash === inscriptionHash) {
-      return froggy.inscriptionId;
-    }
-  })?.inscriptionId;
+export function findFroggy(froggyValue: number | string) {
+  switch (typeof froggyValue) {
+    case "string":
+      return froggyData.find((froggy) => froggy.inscriptionHash === froggyValue);
+    case "number":
+      if (froggyValue > 10000) {
+        return froggyData.find((froggy) => froggy.inscriptionId === froggyValue);
+      } else {
+        return froggyData.find((froggy) => froggy.id === froggyValue);
+      }
+  }
 }
 
 export function getExplorerUrl(txId: string, network: AppNetwork) {
@@ -60,9 +41,29 @@ export const validateFroggysMemo = (memo: string) => {
   const restAsNumber = parseInt(memo.slice(1));
   if (isNaN(restAsNumber)) return false;
 
-  // require the memotAsT
-  const restAsTokenId = inscriptionIdToTokenId(restAsNumber);
+  const restAsTokenId = findFroggy(restAsNumber)?.id;
   if (!restAsTokenId) return false;
 
   return true;
+};
+
+const colors = ["#7dd3fc", "#f9a8d4", "#86efac", "#fde047", "#fca5a5", "#c4b5fd", "#93c5fd", "#a5b4fc", "#c4b5fd"];
+
+const getRandomColor = () => {
+  return colors[Math.floor(Math.random() * colors.length)];
+};
+
+const getRandomFroggy = () => {
+  return froggyData[Math.floor(Math.random() * froggyData.length)];
+};
+
+export const generateBoxGridData = () => {
+  const rows = new Array(24).fill(1);
+  const cols = new Array(24).fill(1);
+  return rows.map(() =>
+    cols.map(() => {
+      const froggy = getRandomFroggy();
+      return { ...froggy, color: getRandomColor() };
+    })
+  );
 };

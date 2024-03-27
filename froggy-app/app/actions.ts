@@ -1,6 +1,117 @@
 import { kv } from "@vercel/kv";
-import { froggyData } from "@/lib/froggy-data";
-import { FroggyHop } from "@/lib/types";
+import { FroggyHop, HopStatus, TxStatus } from "@/lib/types";
+
+export async function addFroggyHop(data: FroggyHop): Promise<Boolean> {
+  const { txId, txStatus, hopStatus, tokenId } = data;
+  if (!txId || !txStatus || !hopStatus || !tokenId) {
+    console.error("Missing required data for froggy hop transaction");
+    return false;
+  }
+  try {
+    const multi = kv.multi();
+    multi.hset(`tx:${txId}`, data);
+    multi.sadd(`txStatus:${txStatus}`, txId);
+    multi.sadd(`hopStatus:${hopStatus}`, txId);
+    multi.sadd(`tokenId:${tokenId}`, txId);
+    await multi.exec();
+    return true;
+  } catch (error) {
+    console.error("Failed to add froggy hop transaction", error);
+    return false;
+  }
+}
+
+export async function updateFroggyHop(data: FroggyHop): Promise<Boolean> {
+  const { txId, txStatus, hopStatus, tokenId } = data;
+  try {
+    const {
+      txStatus: prevTxStatus,
+      hopStatus: prevHopStatus,
+      tokenId: prevTokenId,
+    } = (await kv.hgetall<FroggyHop>(`tx:${txId}`)) || {};
+    if (!prevTxStatus || !prevHopStatus || !prevTokenId) {
+      console.error(`No existing transaction found for txId: ${txId}`);
+      return false;
+    }
+    const multi = kv.multi();
+    multi.hset(`tx:${txId}`, data);
+    if (prevTxStatus !== txStatus) {
+      multi.srem(`txStatus:${prevTxStatus}`, txId);
+      multi.sadd(`txStatus:${txStatus}`, txId);
+    }
+    if (prevHopStatus !== hopStatus) {
+      multi.srem(`hopStatus:${prevHopStatus}`, txId);
+      multi.sadd(`hopStatus:${hopStatus}`, txId);
+    }
+    if (prevTokenId !== tokenId) {
+      multi.srem(`tokenId:${prevTokenId}`, txId);
+      multi.sadd(`tokenId:${tokenId}`, txId);
+    }
+    await multi.exec();
+    return true;
+  } catch (error) {
+    console.error("Failed to update froggy hop transaction", error);
+    return false;
+  }
+}
+
+export async function getFroggyHopByTxId(txId: string): Promise<FroggyHop | null> {
+  try {
+    const data = await kv.hgetall<FroggyHop>(`tx:${txId}`);
+    return data;
+  } catch (error) {
+    console.error("Failed to get froggy hop transaction", error);
+    return null;
+  }
+}
+
+export async function getAllHoppedFrogs(): Promise<FroggyHop[]> {
+  try {
+    const hoppedTxIds = (await kv.smembers(`hopStatus:${HopStatus.HOPPED}`)) || [];
+    if (!hoppedTxIds.length) {
+      return [];
+    }
+    const multi = kv.multi();
+    hoppedTxIds.forEach((txId) => multi.hgetall<FroggyHop>(`tx:${txId}`));
+    const hops = await multi.exec<FroggyHop[]>();
+    return hops;
+  } catch (error) {
+    console.error("Failed to get all hopped frogs", error);
+    return [];
+  }
+}
+
+export async function getHoppingFrogs(): Promise<FroggyHop[]> {
+  try {
+    const hoppingTxIds = (await kv.smembers(`hopStatus:${HopStatus.HOPPING}`)) || [];
+    if (!hoppingTxIds.length) {
+      return [];
+    }
+    const multi = kv.multi();
+    hoppingTxIds.forEach((txId) => multi.hgetall<FroggyHop>(`tx:${txId}`));
+    const hops = await multi.exec<FroggyHop[]>();
+    return hops;
+  } catch (error) {
+    console.error("Failed to get hopping frogs", error);
+    return [];
+  }
+}
+
+export async function getPendingFroggyTxs(): Promise<FroggyHop[]> {
+  try {
+    const pendingTxIds = (await kv.smembers(`txStatus:${TxStatus.PENDING}`)) || [];
+    if (!pendingTxIds.length) {
+      return [];
+    }
+    const multi = kv.multi();
+    pendingTxIds.forEach((txId) => multi.hgetall<FroggyHop>(`tx:${txId}`));
+    const hops = await multi.exec<FroggyHop[]>();
+    return hops;
+  } catch (error) {
+    console.error("Failed to get pending transactions", error);
+    return [];
+  }
+}
 
 export async function saveSordEvent(data: string) {
   try {
@@ -18,74 +129,3 @@ export async function getSordEvents() {
     console.error("Failed to get sord events", error);
   }
 }
-
-export async function saveFroggyHop(data: FroggyHop) {
-  try {
-    await kv.lpush<FroggyHop>("froggy-hop", data);
-  } catch (error) {
-    console.error("Failed to save froggy hop transaction", error);
-  }
-}
-
-export async function saveFroggyHopBack(data: FroggyHop) {
-  try {
-    await kv.lpush<FroggyHop>("froggy-hop-back", data);
-  } catch (error) {
-    console.error("Failed to save froggy hop back transaction", error);
-  }
-}
-
-export async function updateFroggyHopByIndex(index: number, data: FroggyHop) {
-  try {
-    await kv.lset("froggy-hop", index, data);
-  } catch (error) {
-    console.error("Failed to update froggy hop transaction", error);
-  }
-}
-
-export async function updateFroggyHopBackByIndex(index: number, data: FroggyHop) {
-  try {
-    await kv.lset("froggy-hop-back", index, data);
-  } catch (error) {
-    console.error("Failed to update froggy hop back transaction", error);
-  }
-}
-
-export async function getFroggyHops() {
-  try {
-    const hops = await kv.lrange<FroggyHop>("froggy-hop", 0, -1);
-    return hops;
-  } catch (error) {
-    console.error("Failed to get froggy hop transactions", error);
-  }
-}
-
-export async function getFroggyHopBacks() {
-  try {
-    const hops = await kv.lrange<FroggyHop>("froggy-hop-back", 0, -1);
-    return hops;
-  } catch (error) {
-    console.error("Failed to get froggy hop back transactions", error);
-  }
-}
-
-const colors = ["#7dd3fc", "#f9a8d4", "#86efac", "#fde047", "#fca5a5", "#c4b5fd", "#93c5fd", "#a5b4fc", "#c4b5fd"];
-
-const getRandomColor = () => {
-  return colors[Math.floor(Math.random() * colors.length)];
-};
-
-const getRandomFroggy = () => {
-  return froggyData[Math.floor(Math.random() * froggyData.length)];
-};
-
-export const generateBoxGridData = () => {
-  const rows = new Array(24).fill(1);
-  const cols = new Array(24).fill(1);
-  return rows.map(() =>
-    cols.map(() => {
-      const froggy = getRandomFroggy();
-      return { ...froggy, color: getRandomColor() };
-    })
-  );
-};

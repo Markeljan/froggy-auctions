@@ -2,12 +2,7 @@ import { NextResponse } from "next/server";
 import { StacksTransaction, TokenTransferPayload, deserializeTransaction } from "@stacks/transactions";
 import { saveSordEvent, getSordEvents } from "@/app/actions";
 import { validateFroggysMemo } from "@/lib/utils/misc";
-import { FROGGY_AGENT_ADDRESS } from "@/app/config";
-
-const CHAINHOOK_AUTH_KEY = process.env.CHAINHOOK_AUTH_KEY;
-if (!CHAINHOOK_AUTH_KEY) {
-  throw new Error("ENV variable misssing");
-}
+import { CHAINHOOK_AUTH_KEY, FROGGY_AGENT_ADDRESS } from "@/app/config";
 
 export async function POST(request: Request): Promise<NextResponse> {
   console.log("request", request);

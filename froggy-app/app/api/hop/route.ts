@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { FROGGY_AGENT_ADDRESS, SORDINALS_CONTRACT_ADDRESS, transactionsApi } from "@/app/config";
-import { FroggyHop, FroggyHopContractCall } from "@/lib/types";
-import { inscriptionHashToInscriptionId } from "@/lib/utils/misc";
-import { getFroggyHops, saveFroggyHop } from "@/app/actions";
+import { FroggyHop, FroggyHopContractCall, HopStatus, TxStatus } from "@/lib/types";
+import { findFroggy } from "@/lib/utils/misc";
+import { addFroggyHop, getAllHoppedFrogs } from "@/app/actions";
 
 const TRANSFER_PREFIX = "0x74";
 
@@ -34,9 +34,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   const inscriptionHashFromMemo = memo.slice(TRANSFER_PREFIX.length);
-  const inscriptionId = inscriptionHashToInscriptionId(inscriptionHashFromMemo);
-  if (!inscriptionId) {
-    return NextResponse.json({ error: "Invalid inscriptionId" }, { status: 400 });
+  const { inscriptionId, id: tokenId } = findFroggy(inscriptionHashFromMemo) || {};
+  if (!inscriptionId || !tokenId) {
+    return NextResponse.json({ error: "Invalid inscriptionHash" }, { status: 400 });
   }
 
   const froggyHop = {
@@ -44,18 +44,21 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     sender: tx.sender_address,
     recipient,
     memo,
+    tokenId,
     inscriptionId,
-    txStatus: tx.tx_status,
-    hopStatus: "pending",
+    txStatus: TxStatus.PENDING,
+    hopStatus: HopStatus.HOPPING,
   } as FroggyHop;
 
-  // push the hop to db
-  await saveFroggyHop(froggyHop);
+  const writeSuccess = await addFroggyHop(froggyHop);
+  if (!writeSuccess) {
+    return NextResponse.json({ error: "Failed to save hop" }, { status: 500 });
+  }
 
   return NextResponse.json({ txId }, { status: 200 });
 }
 
 export async function GET(): Promise<NextResponse> {
-  const hopList = await getFroggyHops();
+  const hopList = await getAllHoppedFrogs();
   return NextResponse.json(hopList, { status: 200 });
 }

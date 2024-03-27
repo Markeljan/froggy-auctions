@@ -2,19 +2,21 @@
 
 import { FROGGYS_PARENT_HASH, FROGGY_AGENT_ADDRESS } from "@/app/config";
 import { useQuery } from "@tanstack/react-query";
-import { FroggyHop, SordinalsFroggyData } from "@/lib/types";
-import { getHops } from "@/lib/api/get-hops";
+import { SordinalsFroggyData } from "@/lib/types";
+import { getAllHoppedFrogs } from "@/lib/api/get-hopped-froggs";
 
 async function fetchFroggys({ address, inscriptionId }: { address?: string; inscriptionId?: number }) {
-  const response = await fetch(`https://api.sordinals.com/api/v1/inscriptions/owner/${FROGGY_AGENT_ADDRESS}?limit=10000`);
+  const response = await fetch(
+    `https://api.sordinals.com/api/v1/inscriptions/owner/${FROGGY_AGENT_ADDRESS}?limit=10000`
+  );
   const { data } = (await response.json()) as { data: SordinalsFroggyData[] };
   const agentFroggys = data?.filter((sord: { parentHash: string }) => sord.parentHash === FROGGYS_PARENT_HASH);
-  const hopList = (await getHops()) as FroggyHop[];
+  const hoppedFrogsList = await getAllHoppedFrogs();
   if (address) {
     const response = await fetch(`https://api.sordinals.com/api/v1/inscriptions/owner/${address}?limit=10000`);
     const { data } = (await response.json()) as { data: SordinalsFroggyData[] };
     const froggys = data?.filter((sord: { parentHash: string }) => sord.parentHash === FROGGYS_PARENT_HASH);
-    const userHoppedFroggys = hopList
+    const userHoppedFroggys = hoppedFrogsList
       .map((hop) => {
         if (hop.sender === address) {
           return agentFroggys.find((sord) => sord.id === hop.inscriptionId.toString());

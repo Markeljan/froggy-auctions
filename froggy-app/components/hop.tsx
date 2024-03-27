@@ -13,13 +13,8 @@ import {
   SORDINALS_CONTRACT_ADDRESS,
   network,
 } from "@/app/config";
-import {
-  getExplorerUrl,
-  inscriptionIdToTokenId,
-  tokenIdToInscriptionHash,
-  tokenIdToInscriptionId,
-} from "@/lib/utils/misc";
-import { useFroggysQuery } from "@/lib/api/use-froggys-query";
+import { getExplorerUrl, findFroggy } from "@/lib/utils/misc";
+import { useFroggysQuery } from "@/lib/hooks/use-froggys-query";
 import {
   AnchorMode,
   FungibleConditionCode,
@@ -31,7 +26,7 @@ import {
   bufferCV,
   principalCV,
 } from "@stacks/transactions";
-import { useReadContract } from "@/lib/api/use-contract-query";
+import { useReadContract } from "@/lib/hooks/use-contract-query";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { Froggys } from "@/components/froggys";
@@ -44,8 +39,8 @@ export const Hop = () => {
   const { doContractCall } = useConnect();
   const [inputValue, setInputValue] = useState<string>("");
   const inputValueNumber = parseInt(inputValue);
-  const tokenId = inputValueNumber > 10000 ? inscriptionIdToTokenId(inputValueNumber) : inputValueNumber;
-  const inscriptionId = inputValueNumber <= 10000 ? tokenIdToInscriptionId(inputValueNumber) : inputValueNumber;
+  const tokenId = inputValueNumber > 10000 ? findFroggy(inputValueNumber)?.id : inputValueNumber;
+  const inscriptionId = inputValueNumber <= 10000 ? findFroggy(inputValueNumber)?.inscriptionId : inputValueNumber;
   const [hopTxId, setHopTxId] = useState<string>();
   const { data } = useFroggysQuery({ inscriptionId: inscriptionId }) as { data: SordinalsFroggyData };
   const { data: readTokenOwner } = useReadContract({
@@ -64,7 +59,7 @@ export const Hop = () => {
     event.preventDefault();
     if (!userAddress || !tokenId) return;
 
-    const hexString = Buffer.from("t").toString("hex") + tokenIdToInscriptionHash(tokenId);
+    const hexString = Buffer.from("t").toString("hex") + findFroggy(tokenId)?.inscriptionHash;
     const memo = Buffer.from(hexString, "hex");
     const memoCV = bufferCV(memo);
 
@@ -83,7 +78,6 @@ export const Hop = () => {
       },
       onFinish: async (result) => {
         console.log("STX Transfer result:", result.txId);
-
         // send hop data to the agent
         await postHop({ txId: result.txId });
         console.log("Hop result:", result);
@@ -123,10 +117,10 @@ export const Hop = () => {
       contractName: "froggys",
       functionName: "hop-back",
       functionArgs: [uintCV(tokenId)],
-      network: network,
-      fee: 100000,
-      anchorMode: AnchorMode.Any,
       postConditions: [sendStxPostCondition, sendNftPostCondition],
+      fee: 100000,
+      network: network,
+      anchorMode: AnchorMode.Any,
       onCancel: () => {
         toast("Transaction cancelled", { icon: "🚫" });
         return;

@@ -82,14 +82,29 @@ export type FroggyHopContractCall = {
   };
 };
 
+export enum TxStatus {
+  PENDING = "pending",
+  SUCCESS = "success",
+  INVALID = "invalid",
+  FAILED = "failed",
+}
+
+export enum HopStatus {
+  NONE = "none",
+  HOPPING = "hopping",
+  HOPPING_BACK = "hopping-back",
+  HOPPED = "hopped",
+}
+
 export type FroggyHop = {
   txId: string;
   sender: string;
   recipient: string;
   memo: string;
+  tokenId: number;
   inscriptionId: number;
-  txStatus: string;
-  hopStatus: "pending" | "completed" | "failed";
+  txStatus: TxStatus;
+  hopStatus: HopStatus;
 };
 
 export type SordinalsFroggyData = {

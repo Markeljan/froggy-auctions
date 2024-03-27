@@ -13,7 +13,7 @@ type ReadContractArgs = {
 };
 
 // call a read-only function
-async function readContract({ contractAddress, contractName, functionName, functionArgs }: ReadContractArgs) {
+export async function readContract({ contractAddress, contractName, functionName, functionArgs }: ReadContractArgs) {
   const functionArgsCV =
     functionArgs?.map((arg) => {
       if (typeof arg === "number") {

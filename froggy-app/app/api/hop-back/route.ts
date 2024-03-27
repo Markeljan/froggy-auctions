@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { FROGGY_AGENT_ADDRESS, FROGGY_CONTRACT_ADDRESS, transactionsApi } from "@/app/config";
-import { FroggyHop, FroggyHopContractCall } from "@/lib/types";
-import { tokenIdToInscriptionHash, tokenIdToInscriptionId } from "@/lib/utils/misc";
-import { saveFroggyHopBack } from "@/app/actions";
+import { FroggyHop, FroggyHopContractCall, HopStatus, TxStatus } from "@/lib/types";
+import { findFroggy } from "@/lib/utils/misc";
+import { addFroggyHop } from "@/app/actions";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const data = await request.json();
@@ -21,26 +21,26 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   const tokenId = parseInt(tx?.contract_call?.function_args[0]?.repr.split("u")[1]);
-  const inscriptionId = tokenIdToInscriptionId(tokenId);
-  const inscriptionHash = tokenIdToInscriptionHash(tokenId);
-  if (!inscriptionHash) {
+  const { inscriptionId, inscriptionHash } = findFroggy(tokenId) || {};
+  if (!inscriptionHash || !inscriptionId) {
     return NextResponse.json({ error: "Invalid tokenId" }, { status: 400 });
   }
 
-  const hexString = Buffer.from("t").toString("hex") + inscriptionHash; // inscription hash is a 64 symbols long hex identifier
+  const memoString = Buffer.from("t").toString("hex") + inscriptionHash;
 
   const froggyHopBack = {
     txId,
     sender: tx.sender_address,
     recipient: FROGGY_AGENT_ADDRESS,
-    memo: hexString,
+    memo: memoString,
+    tokenId,
     inscriptionId,
-    txStatus: tx.tx_status,
-    hopStatus: "pending",
+    txStatus: TxStatus.PENDING,
+    hopStatus: HopStatus.HOPPING,
   } as FroggyHop;
 
   // push the hop to db
-  await saveFroggyHopBack(froggyHopBack);
+  await addFroggyHop(froggyHopBack);
 
   return NextResponse.json({ txId }, { status: 200 });
 }

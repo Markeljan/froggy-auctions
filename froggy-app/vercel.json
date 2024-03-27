@@ -1,11 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/cron-hop",
-      "schedule": "*/15 * * * *"
-    },
-    {
-      "path": "/api/cron-hop-back",
+      "path": "/api/cron-agent",
       "schedule": "*/15 * * * *"
     }
   ]
