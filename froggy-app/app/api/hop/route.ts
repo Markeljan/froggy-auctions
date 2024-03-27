@@ -55,7 +55,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   return NextResponse.json({ txid }, { status: 200 });
 }
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
+export async function GET(): Promise<NextResponse> {
   const hopList = await getFroggyHops();
   return NextResponse.json(hopList, { status: 200 });
 }
