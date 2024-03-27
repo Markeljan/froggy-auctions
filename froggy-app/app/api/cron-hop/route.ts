@@ -68,7 +68,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       continue;
     }
     // confirm the transaction status is success
-    const transaction = (await transactionsApi.getTransactionById({ txId: txId })) as FroggyHopTransaction;
+    const transaction = (await transactionsApi.getTransactionById({ txId })) as FroggyHopTransaction;
     if (!transaction) {
       console.error(`Transaction not found for txId: ${txId}`);
       continue;

@@ -4,13 +4,11 @@ import { FroggyHop, FroggyHopContractCall } from "@/lib/types";
 import { tokenIdToInscriptionHash, tokenIdToInscriptionId } from "@/lib/utils/misc";
 import { saveFroggyHopBack } from "@/app/actions";
 
-const TRANSFER_PREFIX = "0x74";
-
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const data = await request.json();
   const { txId } = data as { txId: string };
 
-  const tx = (await transactionsApi.getTransactionById({ txId: txId })) as FroggyHopContractCall;
+  const tx = (await transactionsApi.getTransactionById({ txId })) as FroggyHopContractCall;
   if (!tx) {
     return NextResponse.json({ error: "Transaction not found" }, { status: 404 });
   }
