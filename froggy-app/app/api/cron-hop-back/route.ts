@@ -51,7 +51,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   // loop through the hops, until one is successfully executed
   for (let i = 0; i < hopList.length; i++) {
     const hop = hopList[i];
-    const { inscriptionId, txStatus, hopStatus, recipient, txid, sender } = hop;
+    const { inscriptionId, txStatus, hopStatus, recipient, txId, sender } = hop;
     if (hopStatus !== "pending") {
       continue;
     }
@@ -64,14 +64,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       continue;
     }
     // confirm the transaction status is success
-    const transaction = (await transactionsApi.getTransactionById({ txId: txid })) as FroggyHopTransaction;
+    const transaction = (await transactionsApi.getTransactionById({ txId: txId })) as FroggyHopTransaction;
     if (!transaction) {
-      console.error(`Transaction not found for txid: ${txid}`);
+      console.error(`Transaction not found for txId: ${txId}`);
       continue;
     }
 
     if (transaction.tx_status !== "success") {
-      console.error(`Transaction has not been confirmed yet for txid: ${txid}`);
+      console.error(`Transaction has not been confirmed yet for txId: ${txId}`);
       continue;
     }
 
@@ -109,7 +109,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       // update the hop status
       hop.hopStatus = "completed";
       hop.txStatus = transaction.tx_status;
-      hop.txid = txid;
+      hop.txId = txid;
 
       // update froggy by the index
       await updateFroggyHopBackByIndex(hopList.indexOf(hop), hop);

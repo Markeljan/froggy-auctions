@@ -85,7 +85,7 @@ export const Hop = () => {
         console.log("STX Transfer result:", result.txId);
 
         // send hop data to the agent
-        await postHop({ txid: result.txId });
+        await postHop({ txId: result.txId });
         console.log("Hop result:", result);
 
         toast(
@@ -132,7 +132,7 @@ export const Hop = () => {
         return;
       },
       onFinish: async (result) => {
-        await postHopBack({ txid: result.txId });
+        await postHopBack({ txId: result.txId });
         toast(
           <div className="flex flex-col space-x-2 items-center">
             <p>Transaction submitted</p>

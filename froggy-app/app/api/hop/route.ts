@@ -8,9 +8,9 @@ const TRANSFER_PREFIX = "0x74";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const data = await request.json();
-  const { txid } = data as { txid: string };
+  const { txId } = data as { txId: string };
 
-  const tx = (await transactionsApi.getTransactionById({ txId: txid })) as FroggyHopContractCall;
+  const tx = (await transactionsApi.getTransactionById({ txId })) as FroggyHopContractCall;
 
   if (!tx) {
     return NextResponse.json({ error: "Transaction not found" }, { status: 404 });
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   const froggyHop = {
-    txid,
+    txId,
     sender: tx.sender_address,
     recipient,
     memo,
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   // push the hop to db
   await saveFroggyHop(froggyHop);
 
-  return NextResponse.json({ txid }, { status: 200 });
+  return NextResponse.json({ txId }, { status: 200 });
 }
 
 export async function GET(): Promise<NextResponse> {

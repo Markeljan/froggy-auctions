@@ -1,11 +1,11 @@
-export async function postHop({ txid }: { txid: string }) {
+export async function postHop({ txId }: { txId: string }) {
   const response = await fetch("/api/hop", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      txid,
+      txId,
     }),
   });
 

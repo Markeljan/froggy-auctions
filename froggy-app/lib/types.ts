@@ -83,7 +83,7 @@ export type FroggyHopContractCall = {
 };
 
 export type FroggyHop = {
-  txid: string;
+  txId: string;
   sender: string;
   recipient: string;
   memo: string;

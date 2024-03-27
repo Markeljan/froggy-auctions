@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SignedContractCallOptions, getNonce, makeContractCall, principalCV, uintCV } from "@stacks/transactions";
+import {
+  NonFungibleConditionCode,
+  SignedContractCallOptions,
+  callReadOnlyFunction,
+  createAssetInfo,
+  createNonFungiblePostCondition,
+  cvToValue,
+  getNonce,
+  makeContractCall,
+  principalCV,
+  uintCV,
+} from "@stacks/transactions";
 import { broadcastTransaction, AnchorMode } from "@stacks/transactions";
 import {
   FROGGYS_PARENT_HASH,
@@ -31,7 +42,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ message: "No hops to execute" }, { status: 200 });
   }
 
-  const sordinalsResponse = await fetch(`https://api.sordinals.com/api/v1/inscriptions/owner/${FROGGY_AGENT_ADDRESS}?limit=10000`);
+  const sordinalsResponse = await fetch(
+    `https://api.sordinals.com/api/v1/inscriptions/owner/${FROGGY_AGENT_ADDRESS}?limit=10000`
+  );
   const sordinalsData = await sordinalsResponse.json();
   const agentFroggys = sordinalsData?.data?.filter(
     (sord: { parentHash: string }) => sord.parentHash === FROGGYS_PARENT_HASH
@@ -43,12 +56,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   // loop through the hops, until one is successfully executed
   for (let i = 0; i < hopList.length; i++) {
     const hop = hopList[i];
-    const { inscriptionId, txStatus, hopStatus, recipient, txid, sender } = hop;
+    const { inscriptionId, txStatus, hopStatus, recipient, txId, sender } = hop;
     if (hopStatus !== "pending") {
       continue;
     }
     // check if the froggy agent owns the froggy
-
     const isFroggyHeldByAgent = agentFroggys?.some((sord: { id: string }) => sord.id === inscriptionId.toString());
 
     if (!isFroggyHeldByAgent) {
@@ -56,14 +68,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       continue;
     }
     // confirm the transaction status is success
-    const transaction = (await transactionsApi.getTransactionById({ txId: txid })) as FroggyHopTransaction;
+    const transaction = (await transactionsApi.getTransactionById({ txId: txId })) as FroggyHopTransaction;
     if (!transaction) {
-      console.error(`Transaction not found for txid: ${txid}`);
+      console.error(`Transaction not found for txId: ${txId}`);
       continue;
     }
 
     if (transaction.tx_status !== "success") {
-      console.error(`Transaction has not been confirmed yet for txid: ${txid}`);
+      console.error(`Transaction has not been confirmed yet for txId: ${txId}`);
       continue;
     }
 
@@ -73,7 +85,31 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       continue;
     }
 
-    // execute the hop
+    const contractSendsNFTPostCondition = createNonFungiblePostCondition(
+      FROGGY_CONTRACT_ADDRESS,
+      NonFungibleConditionCode.Sends,
+      createAssetInfo(FROGGY_CONTRACT_ADDRESS, "froggys", "froggys"),
+      uintCV(tokenId)
+    );
+
+    // check if the froggy is owned by the contract
+    const tokenOwnerResponse = await callReadOnlyFunction({
+      contractAddress: FROGGY_CONTRACT_ADDRESS,
+      contractName: "froggys",
+      functionName: "get-owner",
+      functionArgs: [uintCV(tokenId)],
+      network: network,
+      senderAddress: FROGGY_AGENT_ADDRESS,
+    });
+
+    // get val
+    const tokenOwnerClarityValue = cvToValue(tokenOwnerResponse)?.value;
+    const isOwnedByFroggysContract = tokenOwnerClarityValue?.value === `${FROGGY_CONTRACT_ADDRESS}.froggys`;
+
+    if (tokenOwnerClarityValue && isOwnedByFroggysContract) {
+      throw new Error("Froggy has already been hopped and is not vaulted");
+    }
+
     const txOptions: SignedContractCallOptions = {
       anchorMode: AnchorMode.Any,
       contractAddress: FROGGY_CONTRACT_ADDRESS,
@@ -84,6 +120,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       network: network,
       fee: 100000n, // 0.10 STX
       nonce: nonce + BigInt(i),
+      postConditions: isOwnedByFroggysContract ? [contractSendsNFTPostCondition] : [],
     };
 
     try {
@@ -97,7 +134,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       // update the hop status
       hop.hopStatus = "completed";
       hop.txStatus = transaction.tx_status;
-      hop.txid = txid;
+      hop.txId = txid;
 
       // update froggy by the index
       await updateFroggyHopByIndex(hopList.indexOf(hop), hop);

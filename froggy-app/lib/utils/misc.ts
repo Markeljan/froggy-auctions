@@ -43,12 +43,12 @@ export function inscriptionHashToInscriptionId(inscriptionHash: string) {
   })?.inscriptionId;
 }
 
-export function getExplorerUrl(txid: string, network: AppNetwork) {
+export function getExplorerUrl(txId: string, network: AppNetwork) {
   switch (network) {
     case "devnet":
-      return `http://localhost:8000/txid/${txid}?chain=testnet&api=http://localhost:3999`;
+      return `http://localhost:8000/txid/${txId}?chain=testnet&api=http://localhost:3999`;
     default:
-      return `https://explorer.hiro.so/txid/${txid}?chain=mainnet`;
+      return `https://explorer.hiro.so/txid/${txId}?chain=mainnet`;
   }
 }
 
