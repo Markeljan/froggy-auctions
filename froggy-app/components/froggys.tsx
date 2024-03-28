@@ -72,6 +72,7 @@ export const Froggys = ({ onChange }: { onChange: (value: string) => void }) => 
         data?.map((froggy: FroggyHopWithIdAndOwner, index: number) => {
           const { id: tokenId } = findFroggy(Number(froggy.id)) || {};
           const isHopping = froggy?.hopStatus === HopStatus.HOPPING || froggy?.hopStatus === HopStatus.HOPPING_BACK;
+          console.log("froggy owner", froggy.owner, FROGGY_AGENT_ADDRESS);
           return (
             <ImageCard
               onClick={() => {

@@ -26,21 +26,28 @@ async function fetchFroggys({ address, inscriptionId }: { address?: string; insc
       .filter(Boolean) as SordinalsFroggyData[];
     const userHoppingFroggys = hoppingFrogsList
       .map((hop) => {
-        if (hop.sender === address) {
+        console.log('hop', hop)
+
+        const isMatchingSender = hop.sender === address;
+        const isMatchingRecipient = hop.recipient === address;
+        if (isMatchingSender || isMatchingRecipient) {
           return {
             ...hop,
             id: hop.inscriptionId.toString(),
-            owner: hop.sender,
+            owner: isMatchingSender ? hop.sender : hop.recipient,
           };
         }
       })
       .filter(Boolean) as FroggyHopWithIdAndOwner[];
+    console.log("all hopped froggys", hoppedFrogsList);
     console.log("userHoppingFroggys", userHoppingFroggys);
     const userFroggys = [...froggys, ...userHoppedFroggys, ...userHoppingFroggys] as FroggyHopWithIdAndOwner[];
 
     const hopModifier = (hopStatus: HopStatus) => {
       switch (hopStatus) {
         case HopStatus.HOPPING:
+          return -1;
+        case HopStatus.HOPPING_BACK:
           return -1;
         case HopStatus.HOPPED:
           return 0;

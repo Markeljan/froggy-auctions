@@ -42,7 +42,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
   const nonce = await getNonce(FROGGY_AGENT_ADDRESS, network);
   const executedTxIds: string[] = [];
-  console.log()
+  console.log();
   const dbTxById = new Map(dbPendingTxs.map((hop) => [hop.txId, hop]));
   // fetch all the transactions using the txId and promise.all
   const liveTransactions = (await Promise.all(
@@ -213,6 +213,8 @@ async function executeFroggyTransaction(
     txId: txid,
     txStatus: TxStatus.PENDING,
     hopStatus: newHopStatus,
+    sender: FROGGY_AGENT_ADDRESS,
+    recipient: dbFroggyHop.sender,
   });
 
   return txid;

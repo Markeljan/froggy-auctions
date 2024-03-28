@@ -1,5 +1,6 @@
 import { kv } from "@vercel/kv";
 import { FroggyHop, HopStatus, TxStatus } from "@/lib/types";
+import { FROGGY_AGENT_ADDRESS } from "./config";
 
 export async function addFroggyHop(data: FroggyHop): Promise<Boolean> {
   const { txId, txStatus, hopStatus, tokenId } = data;
@@ -140,3 +141,24 @@ export async function getSordEvents() {
     console.error("Failed to get sord events", error);
   }
 }
+const hop: FroggyHop = {
+  memo: "0x74a87f28ba37c892ee85231bcbcbadc239c2cfb0cfc1c510ac1533ee75280a09cb",
+  tokenId: 1420,
+  inscriptionId: 11488,
+  txStatus: TxStatus.SUCCESS,
+  hopStatus: HopStatus.HOPPED,
+  txId: "0x4da3331444771e76767a42984987cc5ad6ca9ddea44ab5c97742f94726b68d0a",
+  sender: FROGGY_AGENT_ADDRESS,
+  recipient: "SP2R1VEVDTESA9RBV9A9WE971FP0QDBEQ73ANM1DJ",
+};
+
+// const hop = await getFroggyHopByTxId("0x03a49f5409c2d6a7fc1cd541cedce08dd602c90a5e8dcc75bbbc72686970576e");
+// console.log("hop", hop);
+
+const res = await addFroggyHop(hop);
+
+console.log("res", res);
+
+//const res = hop && (await updateFroggyHop({ ...hop, hopStatus: HopStatus.HOPPING }));
+
+//console.log("res", res);
