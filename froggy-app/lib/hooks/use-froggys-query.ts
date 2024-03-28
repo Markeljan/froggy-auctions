@@ -2,8 +2,9 @@
 
 import { FROGGYS_PARENT_HASH, FROGGY_AGENT_ADDRESS } from "@/app/config";
 import { useQuery } from "@tanstack/react-query";
-import { FroggyHopWithIdAndOwner, HopStatus, SordinalsFroggyData } from "@/lib/types";
+import { FroggyHop, FroggyHopWithIdAndOwner, HopStatus, SordinalsFroggyData } from "@/lib/types";
 import { getAllHoppedFrogs, getAllHoppingFrogs } from "@/lib/api/get-hopped-froggs";
+import { getLastTxByInscriptionId } from "../api/get-last-tx";
 
 async function fetchFroggys({ address, inscriptionId }: { address?: string; inscriptionId?: number }) {
   const response = await fetch(
@@ -68,10 +69,13 @@ async function fetchFroggys({ address, inscriptionId }: { address?: string; insc
 
     return uniqueUserFroggys;
   } else {
+    const lastFroggyTx: FroggyHop | undefined = inscriptionId
+      ? await getLastTxByInscriptionId(inscriptionId)
+      : undefined;
+    // handle fetching a single froggy with inscriptionId
     const response = await fetch(`https://api.sordinals.com/api/v1/inscriptions/${inscriptionId}`);
     const data = (await response.json()) as SordinalsFroggyData & { hopStatus: HopStatus };
-    //get the froggy's HopStatus
-    const froggyHopStatus = hoppedFrogsList.find((hop) => hop.inscriptionId === inscriptionId)?.hopStatus;
+    const froggyHopStatus = lastFroggyTx?.hopStatus;
     const froggy = {
       ...data,
       hopStatus: froggyHopStatus,

@@ -53,10 +53,9 @@ export const Hop = () => {
     enabled: !!tokenId,
   });
   const froggyImage = `/frogs/${tokenId || 1}.png`;
-  const isHopping = data?.hopStatus === HopStatus.HOPPING || data?.hopStatus === HopStatus.HOPPING_BACK;
+  const isHopping = Boolean(data?.hopStatus === HopStatus.HOPPING || data?.hopStatus === HopStatus.HOPPING_BACK);
   const isHopDisabled = isHopping ? true : !!data?.owner ? data?.owner !== userAddress : true;
   const isHopBackDisabled = isHopping ? true : !!readTokenOwner ? readTokenOwner !== userAddress : true;
-
   const handleHop = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!userAddress || !tokenId) return;
@@ -150,7 +149,7 @@ export const Hop = () => {
           src={froggyImage}
           style={{
             imageRendering: "pixelated",
-            filter: isHopDisabled && isHopBackDisabled ? "grayscale(100%)" : "none",
+            filter: isHopDisabled && isHopBackDisabled && !isHopping ? "grayscale(100%)" : "none",
           }}
           alt="Froggy"
           className="w-48 h-48 select-none pointer-events-none border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
