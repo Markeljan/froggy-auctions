@@ -2,9 +2,9 @@ import { kv } from "@vercel/kv";
 import { FroggyHop, HopStatus, TxStatus } from "@/lib/types";
 
 export async function addFroggyHop(data: FroggyHop): Promise<Boolean> {
-  const { txStatus, hopStatus, tokenId } = data;
+  data.txId = data.txId.startsWith("0x") ? data.txId : `0x${data.txId}`;
+  const { txId, txStatus, hopStatus, tokenId } = data;
   // override check for txId
-  const txId = data.txId.startsWith("0x") ? data.txId : `0x${data.txId}`;
   if (!txId || !txStatus || !hopStatus || !tokenId) {
     console.error("Missing required data for froggy hop transaction");
     return false;
@@ -25,9 +25,9 @@ export async function addFroggyHop(data: FroggyHop): Promise<Boolean> {
 }
 
 export async function updateFroggyHop(data: FroggyHop): Promise<Boolean> {
-  const { txStatus, hopStatus, tokenId } = data;
+  data.txId = data.txId.startsWith("0x") ? data.txId : `0x${data.txId}`;
+  const { txId, txStatus, hopStatus, tokenId } = data;
   // override check for txId
-  const txId = data.txId.startsWith("0x") ? data.txId : `0x${data.txId}`;
   try {
     const {
       txStatus: prevTxStatus,
