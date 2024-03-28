@@ -74,8 +74,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     if (contractAddress !== SORDINALS_CONTRACT_ADDRESS || contractFunctionName !== "transfer-memo-single") {
       return null;
     }
+    const sender = tx.sender_address;
     const recipient = tx?.contract_call?.function_args[0]?.repr.split("'")[1];
-    if (recipient !== FROGGY_AGENT_ADDRESS) {
+    if (recipient !== FROGGY_AGENT_ADDRESS || !sender) {
       return null;
     }
     const memo = tx?.contract_call?.function_args[1]?.repr;
@@ -111,7 +112,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       contractAddress: FROGGY_CONTRACT_ADDRESS,
       contractName: "froggys",
       functionName: "hop",
-      functionArgs: [uintCV(tokenId), principalCV(recipient)],
+      functionArgs: [uintCV(tokenId), principalCV(sender)],
       senderKey: FROGGY_AGENT_KEY,
       network: network,
       postConditions: isTokenIdVaulted ? [contractSendsNFTPostCondition] : [],

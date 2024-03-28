@@ -56,8 +56,14 @@ export const Hop = () => {
   console.log("readTokenOwner", readTokenOwner);
   const froggyImage = `/frogs/${tokenId || 1}.png`;
   const isHopping = data?.hopStatus === HopStatus.HOPPING || data?.hopStatus === HopStatus.HOPPING_BACK;
-  const isHopDisabled = isHopping ?? !!data?.owner ? data?.owner !== userAddress : true;
-  const isHopBackDisabled = isHopping ?? !!readTokenOwner ? readTokenOwner !== userAddress : true;
+  const isHopDisabled = isHopping ? true : !!data?.owner ? data?.owner !== userAddress : true;
+  const isHopBackDisabled = isHopping ? true : !!readTokenOwner ? readTokenOwner !== userAddress : true;
+
+  console.log("readTokenOwner", readTokenOwner);
+
+  console.log("isHopDisabled", isHopDisabled);
+  console.log("isHopBackDisabled", isHopBackDisabled);
+  console.log("isHopping", isHopping);
 
   const handleHop = async (event: React.FormEvent) => {
     event.preventDefault();
