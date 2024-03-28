@@ -16,7 +16,8 @@ export async function addFroggyHop(data: FroggyHop): Promise<Boolean> {
     multi.hset(`tx:${txId}`, data);
     multi.sadd(`txStatus:${txStatus}`, txId);
     multi.sadd(`hopStatus:${hopStatus}`, txId);
-    multi.sadd(`tokenId:${tokenId}`, txId);
+    // update tokenId set to always reflect the latest tx for tokenId
+    multi.set(`lastTx:${tokenId}`, txId);
     await multi.exec();
     return true;
   } catch (error) {
@@ -35,8 +36,12 @@ export async function updateFroggyHop(data: FroggyHop): Promise<Boolean> {
       hopStatus: prevHopStatus,
       tokenId: prevTokenId,
     } = (await kv.hgetall<FroggyHop>(`tx:${txId}`)) || {};
-    if (!prevTxStatus || !prevHopStatus || !prevTokenId) {
+    if (!prevTxStatus || !prevHopStatus) {
       console.error(`No existing transaction found for txId: ${txId}`);
+      return false;
+    }
+    if (prevTokenId !== tokenId) {
+      console.error(`Found different tokenId for txId: ${txId}`);
       return false;
     }
     const multi = kv.multi();
@@ -49,15 +54,53 @@ export async function updateFroggyHop(data: FroggyHop): Promise<Boolean> {
       multi.srem(`hopStatus:${prevHopStatus}`, txId);
       multi.sadd(`hopStatus:${hopStatus}`, txId);
     }
-    if (prevTokenId !== tokenId) {
-      multi.srem(`tokenId:${prevTokenId}`, txId);
-      multi.sadd(`tokenId:${tokenId}`, txId);
-    }
+    // update tokenId set to always reflect the latest tx for tokenId
+    multi.set(`lastTx:${tokenId}`, txId);
+
     await multi.exec();
     return true;
   } catch (error) {
     console.error("Failed to update froggy hop transaction", error);
     return false;
+  }
+}
+
+// get last tx for tokenId
+export async function getLastTxByTokenId(tokenId: number): Promise<FroggyHop | null> {
+  try {
+    const txId = (await kv.get<FroggyHop>(`lastTx:${tokenId}`)) || {};
+    if (!txId) {
+      return null;
+    }
+    const data = await kv.hgetall<FroggyHop>(`tx:${txId}`);
+    return data;
+  } catch (error) {
+    console.error("Failed to get last transaction for tokenId", error);
+    return null;
+  }
+}
+
+// get last tx for all tokenIds
+export async function getLastTxForAllTokens(): Promise<FroggyHop[]> {
+  try {
+    const lastTxIds = await kv.keys("lastTx:*");
+    if (!lastTxIds.length) {
+      return [];
+    }
+    const multi = kv.multi();
+    lastTxIds.forEach((key) => multi.get<FroggyHop>(key));
+
+    const txIds = await multi.exec<FroggyHop[]>();
+    if (!txIds.length) {
+      return [];
+    }
+    const multi2 = kv.multi();
+    txIds.forEach((txId) => multi2.hgetall<FroggyHop>(`tx:${txId}`));
+    const hops = await multi2.exec<FroggyHop[]>();
+    return hops;
+  } catch (error) {
+    console.error("Failed to get last transactions for all tokenIds", error);
+    return [];
   }
 }
 
@@ -75,7 +118,7 @@ export async function getFroggyHopByTxId(txId: string): Promise<FroggyHop | null
 
 export async function getAllHoppedFrogs(): Promise<FroggyHop[]> {
   try {
-    const hoppedTxIds = (await kv.smembers(`hopStatus:${HopStatus.HOPPED}`)) || [];
+    const hoppedTxIds = await kv.sinter(`hopStatus:${HopStatus.HOPPED}`, `txStatus:${TxStatus.SUCCESS}`);
     if (!hoppedTxIds.length) {
       return [];
     }
@@ -91,16 +134,14 @@ export async function getAllHoppedFrogs(): Promise<FroggyHop[]> {
 
 export async function getHoppingFrogs(): Promise<FroggyHop[]> {
   try {
-    const hoppingTxIds = [
-      ...((await kv.smembers(`hopStatus:${HopStatus.HOPPING}`)) || []),
-      ...((await kv.smembers(`hopStatus:${HopStatus.HOPPING_BACK}`)) || []),
-    ];
-
-    if (!hoppingTxIds.length) {
+    const hoppingTxIds = await kv.sinter(`hopStatus:${HopStatus.HOPPING}`, `txStatus:${TxStatus.PENDING}`);
+    const hoppingBackTxIds = await kv.sinter(`hopStatus:${HopStatus.HOPPING_BACK}`, `txStatus:${TxStatus.PENDING}`);
+    const hoppingTxIdsSet = new Set([...hoppingTxIds, ...hoppingBackTxIds]);
+    if (!hoppingTxIdsSet.size) {
       return [];
     }
     const multi = kv.multi();
-    hoppingTxIds.forEach((txId) => multi.hgetall<FroggyHop>(`tx:${txId}`));
+    hoppingTxIdsSet.forEach((txId) => multi.hgetall<FroggyHop>(`tx:${txId}`));
     const hops = await multi.exec<FroggyHop[]>();
     return hops;
   } catch (error) {
@@ -141,20 +182,3 @@ export async function getSordEvents() {
     console.error("Failed to get sord events", error);
   }
 }
-const hop: FroggyHop = {
-  memo: "0x74a87f28ba37c892ee85231bcbcbadc239c2cfb0cfc1c510ac1533ee75280a09cb",
-  tokenId: 1420,
-  inscriptionId: 11488,
-  txStatus: TxStatus.SUCCESS,
-  hopStatus: HopStatus.HOPPED,
-  txId: "0x4da3331444771e76767a42984987cc5ad6ca9ddea44ab5c97742f94726b68d0a",
-  sender: FROGGY_AGENT_ADDRESS,
-  recipient: "SP2R1VEVDTESA9RBV9A9WE971FP0QDBEQ73ANM1DJ",
-};
-
-// const hop = await getFroggyHopByTxId("0x03a49f5409c2d6a7fc1cd541cedce08dd602c90a5e8dcc75bbbc72686970576e");
-// console.log("hop", hop);
-
-//const res = hop && (await updateFroggyHop({ ...hop, hopStatus: HopStatus.HOPPING }));
-
-//console.log("res", res);

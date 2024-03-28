@@ -19,14 +19,14 @@ async function fetchFroggys({ address, inscriptionId }: { address?: string; insc
     const froggys = data?.filter((sord: { parentHash: string }) => sord.parentHash === FROGGYS_PARENT_HASH);
     const userHoppedFroggys = hoppedFrogsList
       .map((hop) => {
-        if (hop.sender === address) {
+        if (hop.recipient === address) {
           return agentFroggys.find((sord) => sord.id === hop.inscriptionId.toString());
         }
       })
       .filter(Boolean) as SordinalsFroggyData[];
     const userHoppingFroggys = hoppingFrogsList
       .map((hop) => {
-        console.log('hop', hop)
+        console.log("hop", hop);
 
         const isMatchingSender = hop.sender === address;
         const isMatchingRecipient = hop.recipient === address;
