@@ -9,7 +9,7 @@ import { useIsClient } from "@/lib/hooks/use-is-client";
 import { useChainhooksQuery } from "@/lib/hooks/use-chainhooks-query";
 import toast from "react-hot-toast";
 import { findFroggy, shortenAddress } from "@/lib/utils/misc";
-import { SordinalsFroggyData } from "@/lib/types";
+import { FroggyHopWithIdAndOwner, HopStatus } from "@/lib/types";
 import { cn } from "@/lib/utils/cn";
 import { FROGGY_AGENT_ADDRESS } from "@/app/config";
 
@@ -18,7 +18,7 @@ export const Froggys = ({ onChange }: { onChange: (value: string) => void }) => 
   const { userData } = useUserSession();
   const { userAddress } = userData;
   const { data, isLoading } = useFroggysQuery({ address: userAddress }) as {
-    data: SordinalsFroggyData[];
+    data: Array<FroggyHopWithIdAndOwner>;
     isLoading: boolean;
   };
   const { data: sordEvents } = useChainhooksQuery();
@@ -69,15 +69,17 @@ export const Froggys = ({ onChange }: { onChange: (value: string) => void }) => 
           <VscLoading className="animate-spin w-full h-full" />
         </div>
       ) : (
-        data?.map((froggy: SordinalsFroggyData, index: number) => {
+        data?.map((froggy: FroggyHopWithIdAndOwner, index: number) => {
           const { id: tokenId } = findFroggy(Number(froggy.id)) || {};
+          const isHopping = froggy?.hopStatus === HopStatus.HOPPING || froggy?.hopStatus === HopStatus.HOPPING_BACK;
           return (
             <ImageCard
               onClick={() => {
                 onChange(froggy.id);
               }}
               className={cn("max-w-[150px] w-full mx-auto cursor-pointer", {
-                "bg-green-500": froggy.owner === FROGGY_AGENT_ADDRESS,
+                "bg-orange-400": froggy.owner === FROGGY_AGENT_ADDRESS,
+                "bg-green-400": isHopping,
               })}
               imageUrl={`/frogs/${tokenId}.png`}
               key={index}

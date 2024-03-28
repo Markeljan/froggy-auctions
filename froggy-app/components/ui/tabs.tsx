@@ -10,17 +10,23 @@ type Props = {
 
 export function Tabs({ tabsArray, activeTab, setActiveTab, className, ...rest }: Props) {
   return (
-    <div className={cn("flex flex-col w-[500px] rounded-md shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]", className)} {...rest}>
+    <div
+      className={cn("flex flex-col w-[500px] rounded-md shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]", className)}
+      {...rest}
+    >
       {/* Tabs Row */}
       <div className="flex border-b-2 border-black mx-[2px]">
         {tabsArray.map(({ label }, index) => (
           <button
             key={index}
             onClick={() => setActiveTab(label)}
-            style={{
-              backgroundColor: activeTab === label ? "#a36ec4" : "#C4A1FF",
-            }}
-            className="cursor-pointer flex-1 border-2 border-black -m-[2px] px-6 py-3 text-center font-bold transition-colors first:rounded-tl-md last:rounded-tr-md"
+            className={cn(
+              "cursor-pointer flex-1 border-2 border-black -m-[2px] px-6 py-3 text-center font-bold transition-colors first:rounded-tl-md last:rounded-tr-md",
+              {
+                "bg-purple-400": activeTab === label,
+                "bg-purple-300": activeTab !== label,
+              }
+            )}
           >
             {label}
           </button>

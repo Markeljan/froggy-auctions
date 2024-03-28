@@ -107,6 +107,8 @@ export type FroggyHop = {
   hopStatus: HopStatus;
 };
 
+export type FroggyHopWithIdAndOwner = FroggyHop & { id: string; owner: string };
+
 export type SordinalsFroggyData = {
   id: string;
   type: string;

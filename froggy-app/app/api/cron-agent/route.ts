@@ -36,11 +36,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
   // get all pending txs
   const dbPendingTxs = await getPendingFroggyTxs();
+  console.log("dbPendingTxs", dbPendingTxs);
   if (dbPendingTxs.length === 0) {
     return NextResponse.json({ message: "No pending hops to execute" }, { status: 200 });
   }
   const nonce = await getNonce(FROGGY_AGENT_ADDRESS, network);
   const executedTxIds: string[] = [];
+  console.log()
   const dbTxById = new Map(dbPendingTxs.map((hop) => [hop.txId, hop]));
   // fetch all the transactions using the txId and promise.all
   const liveTransactions = (await Promise.all(
@@ -57,12 +59,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
     return tx.tx_status === "success";
   });
+  console.log("# of successfulTransactions", successfulTransactions.length);
   // handle HOPPING transactions
   successfulTransactions.forEach(async (tx) => {
+    console.log("tx", tx.tx_id);
+    console.log("dbTxById", dbTxById);
     const matchingHop = dbTxById.get(tx.tx_id);
     if (matchingHop?.hopStatus !== HopStatus.HOPPING) {
       return null;
     }
+    console.log("matchingHop", matchingHop);
     const contractAddress = tx?.contract_call?.contract_id?.split(".")[0];
     const contractFunctionName = tx?.contract_call?.function_name;
     if (contractAddress !== SORDINALS_CONTRACT_ADDRESS || contractFunctionName !== "transfer-memo-single") {
@@ -82,6 +88,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       return null;
     }
     const agentFroggys = await getOwnedFroggysByPrinciple(FROGGY_AGENT_ADDRESS);
+    console.log("agentFroggys", agentFroggys);
     const isFroggyHeldByAgent = agentFroggys?.some((sord: { id: string }) => sord.id === inscriptionId.toString());
     if (!isFroggyHeldByAgent) {
       return null;
@@ -89,6 +96,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     const tokenIdHolder = await getFroggyTokenOwner(tokenId);
     const isTokenIdVaulted = tokenIdHolder === `${FROGGY_CONTRACT_ADDRESS}.froggys`;
+
+    console.log("tokenIdHolder", tokenIdHolder);
 
     const contractSendsNFTPostCondition = createNonFungiblePostCondition(
       FROGGY_CONTRACT_ADDRESS,
@@ -140,6 +149,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       console.error(`Token holder does not match sender: ${tokenIdHolder} !== ${sender}`);
       return false;
     }
+
     // validate that the agent owns the froggy inscription
     const agentFroggys = await getOwnedFroggysByPrinciple(FROGGY_AGENT_ADDRESS);
     const isFroggyHeldByAgent = agentFroggys?.some((sord: { id: string }) => sord.id === inscriptionId.toString());

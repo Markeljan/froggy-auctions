@@ -11,10 +11,10 @@ const archivo = Archivo({ subsets: ["latin"], weight: ["400", "600", "700"] });
 
 export const metadata: Metadata = {
   title: "Froggy Auctions",
-  description: "Hop between sOrdinals and SIP-009 NFTs",
+  description: "Hop between sOrdinals and SIP-9 NFTs",
   openGraph: {
     title: "Froggy Auctions",
-    description: "Hop between sOrdinals and SIP-009 NFTs",
+    description: "Hop between sOrdinals and SIP-9 NFTs",
     type: "website",
     url: APP_URL,
     images: [
@@ -45,7 +45,7 @@ export default function RootLayout({
               borderRadius: "6px",
               fontWeight: "bold",
               boxShadow: "4px 4px 0px 0px rgba(0, 0, 0, 1)",
-              backgroundColor: "#C4A1FF",
+              backgroundColor: "#D8B3FE",
             },
           }}
         />

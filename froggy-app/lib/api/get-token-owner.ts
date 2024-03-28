@@ -1,5 +1,5 @@
 import { FROGGY_CONTRACT_ADDRESS } from "@/app/config";
-import { readContract } from "../hooks/use-contract-query";
+import { readContract } from "@/lib/api/read-contract";
 
 export async function getFroggyTokenOwner(tokenId: number) {
   const readContractResponse = await readContract({

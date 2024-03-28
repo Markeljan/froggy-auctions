@@ -28,7 +28,7 @@ export default function Page() {
       <Container className="flex flex-col max-sm:max-w-sm max-lg:max-w-md max-w-3xl w-full mb-2 p-4 justify-center items-center z-10">
         <Button className="flex flex-col justify-center items-center bg-none p-4 space-y-2">
           <p className="max-2xl:text-3xl text-4xl font-bold">Froggy Auctions</p>
-          <p className="max-2xl:text-sm text-lg">Hop between sOrdinals and SIP-009 NFTs</p>
+          <p className="max-2xl:text-sm text-lg">Hop between sOrdinals and SIP-9 NFTs</p>
         </Button>
       </Container>
       <Container className="flex flex-col max-sm:max-w-sm max-lg:max-w-md max-w-3xl w-full p-4 px-8 justify-center items-center z-10 mb-2">

@@ -1,6 +1,6 @@
 # Froggy Auctions
 
-[froggy-auctions.xyz](https://stacks.gamma.io/collections/froggys) showcases a way to interpoerate between the sOrdinals metaprotocol and Stacks native SIP-009 NFTs.
+[froggy-auctions.xyz](https://stacks.gamma.io/collections/froggys) showcases a way to interpoerate between the sOrdinals metaprotocol and Stacks native SIP-9 NFTs.
 
 <img width="1726" alt="image" src="https://github.com/Markeljan/froggy-auctions/assets/12901349/6ee2a9be-e49a-4fac-9757-68685dd7245e">
 
@@ -9,8 +9,8 @@
 Froggy Auctions operates through a simple process:
 
 1. **HOP**: Vault your Froggy inscription to a trusted principal.
-2. SIP-009 Froggy is minted or unvaulted and sent to you.
-3. **HOP BACK**: Vault your SIP-009 Froggy and recover your inscription.
+2. SIP-9 Froggy is minted or unvaulted and sent to you.
+3. **HOP BACK**: Vault your SIP-9 Froggy and recover your inscription.
 
 ## Code Overview
 
@@ -22,8 +22,8 @@ The frontend/backend built with Next.js / React.  Backend API routes are used to
 
 Froggy Clarity smart contract. There are two main functions:
 
-- **hop**: This function is responsible for vaulting Froggy inscriptions and minting SIP-009 Froggies to the recipient.
-- **hop-back**: Used to vault SIP-009 Froggies and recover the inscription.
+- **hop**: This function is responsible for vaulting Froggy inscriptions and minting SIP-9 Froggies to the recipient.
+- **hop-back**: Used to vault SIP-9 Froggies and recover the inscription.
 
 #### Clarinet Testing
 
@@ -38,7 +38,7 @@ A chainhook is used to track STX transfers with memos. After hitting our serverl
 
 Try it out live on Stacks Mainnet at https://froggy-auctions.xyz
 
-## SIP-009 Wrapped Froggys on Gamma
+## SIP-9 Wrapped Froggys on Gamma
 
 [Gamma Collection](https://stacks.gamma.io/collections/froggys)
 

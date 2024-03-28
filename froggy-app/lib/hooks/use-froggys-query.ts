@@ -2,8 +2,8 @@
 
 import { FROGGYS_PARENT_HASH, FROGGY_AGENT_ADDRESS } from "@/app/config";
 import { useQuery } from "@tanstack/react-query";
-import { SordinalsFroggyData } from "@/lib/types";
-import { getAllHoppedFrogs } from "@/lib/api/get-hopped-froggs";
+import { FroggyHopWithIdAndOwner, HopStatus, SordinalsFroggyData } from "@/lib/types";
+import { getAllHoppedFrogs, getAllHoppingFrogs } from "@/lib/api/get-hopped-froggs";
 
 async function fetchFroggys({ address, inscriptionId }: { address?: string; inscriptionId?: number }) {
   const response = await fetch(
@@ -12,6 +12,7 @@ async function fetchFroggys({ address, inscriptionId }: { address?: string; insc
   const { data } = (await response.json()) as { data: SordinalsFroggyData[] };
   const agentFroggys = data?.filter((sord: { parentHash: string }) => sord.parentHash === FROGGYS_PARENT_HASH);
   const hoppedFrogsList = await getAllHoppedFrogs();
+  const hoppingFrogsList = await getAllHoppingFrogs();
   if (address) {
     const response = await fetch(`https://api.sordinals.com/api/v1/inscriptions/owner/${address}?limit=10000`);
     const { data } = (await response.json()) as { data: SordinalsFroggyData[] };
@@ -23,13 +24,56 @@ async function fetchFroggys({ address, inscriptionId }: { address?: string; insc
         }
       })
       .filter(Boolean) as SordinalsFroggyData[];
-    const userFroggys = [...froggys, ...userHoppedFroggys];
-    userFroggys.sort((a: SordinalsFroggyData, b: SordinalsFroggyData) => parseInt(a.id) - parseInt(b.id));
-    return userFroggys;
+    const userHoppingFroggys = hoppingFrogsList
+      .map((hop) => {
+        if (hop.sender === address) {
+          return {
+            ...hop,
+            id: hop.inscriptionId.toString(),
+            owner: hop.sender,
+          };
+        }
+      })
+      .filter(Boolean) as FroggyHopWithIdAndOwner[];
+    console.log("userHoppingFroggys", userHoppingFroggys);
+    const userFroggys = [...froggys, ...userHoppedFroggys, ...userHoppingFroggys] as FroggyHopWithIdAndOwner[];
+
+    const hopModifier = (hopStatus: HopStatus) => {
+      switch (hopStatus) {
+        case HopStatus.HOPPING:
+          return -1;
+        case HopStatus.HOPPED:
+          return 0;
+        default:
+          return 1;
+      }
+    };
+
+    // sort by hopStatus and inscriptionId
+    userFroggys.sort((a, b) => {
+      const aInscriptionIdModifier = parseInt(a.id) - parseInt(b.id);
+      return hopModifier(a.hopStatus) + aInscriptionIdModifier - hopModifier(b.hopStatus);
+    });
+
+    // remove duplicates
+    const uniqueUserFroggys = userFroggys.reduce((acc, froggy) => {
+      if (!acc.some((f) => f.id === froggy.id)) {
+        acc.push(froggy);
+      }
+      return acc;
+    }, [] as Array<FroggyHopWithIdAndOwner>);
+
+    return uniqueUserFroggys;
   } else {
     const response = await fetch(`https://api.sordinals.com/api/v1/inscriptions/${inscriptionId}`);
-    const data = (await response.json()) as SordinalsFroggyData;
-    return data;
+    const data = (await response.json()) as SordinalsFroggyData & { hopStatus: HopStatus };
+    //get the froggy's HopStatus
+    const froggyHopStatus = hoppedFrogsList.find((hop) => hop.inscriptionId === inscriptionId)?.hopStatus;
+    const froggy = {
+      ...data,
+      hopStatus: froggyHopStatus,
+    };
+    return froggy;
   }
 }
 

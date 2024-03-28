@@ -30,7 +30,7 @@ import { useReadContract } from "@/lib/hooks/use-contract-query";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { Froggys } from "@/components/froggys";
-import { SordinalsFroggyData } from "@/lib/types";
+import { HopStatus, SordinalsFroggyData } from "@/lib/types";
 import { postHopBack } from "@/lib/api/post-hop-back";
 
 export const Hop = () => {
@@ -42,7 +42,10 @@ export const Hop = () => {
   const tokenId = inputValueNumber > 10000 ? findFroggy(inputValueNumber)?.id : inputValueNumber;
   const inscriptionId = inputValueNumber <= 10000 ? findFroggy(inputValueNumber)?.inscriptionId : inputValueNumber;
   const [hopTxId, setHopTxId] = useState<string>();
-  const { data } = useFroggysQuery({ inscriptionId: inscriptionId }) as { data: SordinalsFroggyData };
+  const { data } = useFroggysQuery({ inscriptionId: inscriptionId }) as {
+    data: SordinalsFroggyData & { hopStatus: HopStatus };
+  };
+  console.log("data", data);
   const { data: readTokenOwner } = useReadContract({
     contractAddress: FROGGY_CONTRACT_ADDRESS,
     contractName: "froggys",
@@ -50,10 +53,11 @@ export const Hop = () => {
     functionArgs: [tokenId],
     enabled: !!tokenId,
   });
-
+  console.log("readTokenOwner", readTokenOwner);
   const froggyImage = `/frogs/${tokenId || 1}.png`;
-  const isHopDisabled = !!data?.owner ? data?.owner !== userAddress : true;
-  const isHopBackDisabled = !!readTokenOwner ? readTokenOwner !== userAddress : true;
+  const isHopping = data?.hopStatus === HopStatus.HOPPING || data?.hopStatus === HopStatus.HOPPING_BACK;
+  const isHopDisabled = isHopping ?? !!data?.owner ? data?.owner !== userAddress : true;
+  const isHopBackDisabled = isHopping ?? !!readTokenOwner ? readTokenOwner !== userAddress : true;
 
   const handleHop = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -190,13 +194,15 @@ export const Hop = () => {
           )}
         </div>
       </div>
-      <div className="flex gap-y-2 w-full mt-4 max-sm:px-0 px-8 justify-between items-baseline">
+      <div className="flex max-sm:flex-col gap-y-2 w-full mt-4 max-sm:px-0 px-8 justify-between items-baseline">
         <p className="text-2xl">Owned Froggys</p>
-        <div className="flex space-x-4">
-          <div className="bg-[#C4A1FF] h-4 w-4 rounded-full" />
+        <div className="flex max-sm:text-sm font-normal max-sm:space-x-[4px] space-x-4">
+          <div className="bg-purple-300 h-4 w-4 rounded-full" />
           <div>sOrdinals</div>
-          <div className="bg-green-500 h-4 w-4 rounded-full" />
-          <div>SIP-009</div>
+          <div className="bg-green-400 h-4 w-4 rounded-full" />
+          <div>Hopping</div>
+          <div className="bg-orange-400 h-4 w-4 rounded-full" />
+          <div>SIP-9</div>
         </div>
       </div>
 

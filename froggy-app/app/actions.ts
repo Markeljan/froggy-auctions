@@ -3,6 +3,9 @@ import { FroggyHop, HopStatus, TxStatus } from "@/lib/types";
 
 export async function addFroggyHop(data: FroggyHop): Promise<Boolean> {
   const { txId, txStatus, hopStatus, tokenId } = data;
+  // override check for txId
+  data.txId = txId.startsWith("0x") ? txId : `0x${txId}`;
+  console.log("addFroggyHop data:", data);
   if (!txId || !txStatus || !hopStatus || !tokenId) {
     console.error("Missing required data for froggy hop transaction");
     return false;
@@ -23,6 +26,8 @@ export async function addFroggyHop(data: FroggyHop): Promise<Boolean> {
 
 export async function updateFroggyHop(data: FroggyHop): Promise<Boolean> {
   const { txId, txStatus, hopStatus, tokenId } = data;
+  // override check for txId
+  data.txId = txId.startsWith("0x") ? txId : `0x${txId}`;
   try {
     const {
       txStatus: prevTxStatus,
@@ -56,6 +61,8 @@ export async function updateFroggyHop(data: FroggyHop): Promise<Boolean> {
 }
 
 export async function getFroggyHopByTxId(txId: string): Promise<FroggyHop | null> {
+  // override check for txId
+  txId = txId.startsWith("0x") ? txId : `0x${txId}`;
   try {
     const data = await kv.hgetall<FroggyHop>(`tx:${txId}`);
     return data;
@@ -83,7 +90,11 @@ export async function getAllHoppedFrogs(): Promise<FroggyHop[]> {
 
 export async function getHoppingFrogs(): Promise<FroggyHop[]> {
   try {
-    const hoppingTxIds = (await kv.smembers(`hopStatus:${HopStatus.HOPPING}`)) || [];
+    const hoppingTxIds = [
+      ...((await kv.smembers(`hopStatus:${HopStatus.HOPPING}`)) || []),
+      ...((await kv.smembers(`hopStatus:${HopStatus.HOPPING_BACK}`)) || []),
+    ];
+
     if (!hoppingTxIds.length) {
       return [];
     }

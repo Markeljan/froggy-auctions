@@ -10,7 +10,7 @@ export function ImageCard({ imageUrl, children, className, ...rest }: Props) {
   return (
     <figure
       className={cn(
-        "w-[250px] overflow-hidden rounded-md border-2 border-black bg-[#C4A1FF] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none transition-all hover:translate-x-[3px] hover:translate-y-[3px]",
+        "w-[250px] overflow-hidden rounded-md border-2 border-black bg-purple-300 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none transition-all hover:translate-x-[3px] hover:translate-y-[3px]",
         className
       )}
       {...rest}
