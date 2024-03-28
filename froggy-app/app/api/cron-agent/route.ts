@@ -65,7 +65,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       const contractAddress = tx?.contract_call?.contract_id?.split(".")[0];
       const contractFunctionName = tx?.contract_call?.function_name;
       if (contractAddress !== SORDINALS_CONTRACT_ADDRESS || contractFunctionName !== "transfer-memo-single") {
-        console.error("Invalid contract address or function name");
+        console.error(`h Invalid contract address or function name: ${contractAddress} ${contractFunctionName}`);
         return;
       }
       const sender = tx.sender_address;
@@ -126,7 +126,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       const contractAddress = tx?.contract_call?.contract_id?.split(".")[0];
       const contractFunctionName = tx?.contract_call?.function_name;
       if (contractAddress !== FROGGY_CONTRACT_ADDRESS || contractFunctionName !== "hop-back") {
-        console.error("Invalid contract address or function name");
+        console.error(`h-b Invalid contract address or function name: ${contractAddress} ${contractFunctionName}`);
         return false;
       }
       // get the tokenId from the tx function args
@@ -191,9 +191,8 @@ async function executeFroggyTransaction(
 ): Promise<string | undefined> {
   const hopTransaction = await makeContractCall(txOptions);
   const broadcastResponse = await broadcastTransaction(hopTransaction, network);
-  const { txid, error, reason, reason_data } = broadcastResponse;
-  console.log("broadcastResponse", broadcastResponse);
-  if (error || !txid) {
+  const { txid: txId, error, reason, reason_data } = broadcastResponse;
+  if (error || !txId) {
     console.error("Failed to hop", error, reason, reason_data);
     return;
   }
@@ -203,12 +202,12 @@ async function executeFroggyTransaction(
   // add a new dbFroggyHop
   await addFroggyHop({
     ...dbFroggyHop,
-    txId: txid,
+    txId: txId,
     txStatus: TxStatus.PENDING,
     hopStatus: newHopStatus,
     sender: FROGGY_AGENT_ADDRESS,
     recipient: dbFroggyHop.sender,
   });
 
-  return txid;
+  return txId;
 }
