@@ -7,6 +7,7 @@ import { addFroggyHop } from "@/app/actions";
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const data = await request.json();
   const { txId } = data as { txId: string };
+  console.log("POST /api/hop-back txId:", txId);
 
   const tx = (await transactionsApi.getTransactionById({ txId })) as FroggyHopContractCall;
   if (!tx) {
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     tokenId,
     inscriptionId,
     txStatus: TxStatus.PENDING,
-    hopStatus: HopStatus.HOPPING,
+    hopStatus: HopStatus.HOPPING_BACK,
   } as FroggyHop;
 
   // push the hop to db

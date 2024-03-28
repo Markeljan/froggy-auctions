@@ -9,6 +9,7 @@ const TRANSFER_PREFIX = "0x74";
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const data = await request.json();
   const { txId } = data as { txId: string };
+  console.log("POST /api/hop txId:", txId);
 
   const tx = (await transactionsApi.getTransactionById({ txId })) as FroggyHopContractCall;
 
