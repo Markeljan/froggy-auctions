@@ -5,9 +5,6 @@ import { validateFroggysMemo } from "@/lib/utils/misc";
 import { CHAINHOOK_AUTH_KEY, FROGGY_AGENT_ADDRESS } from "@/app/config";
 
 export async function POST(request: Request): Promise<NextResponse> {
-  console.log("request", request);
-  console.log("request.headers", request.headers);
-
   const auth = request.headers.get("authorization");
   if (auth !== `Bearer ${CHAINHOOK_AUTH_KEY}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -36,16 +33,13 @@ export async function POST(request: Request): Promise<NextResponse> {
       amount: stxReceipt?.data.amount,
       memo,
     });
-    console.log("Saving valid Froggy deposit", stringifiedTx);
     await saveSordEvent(stringifiedTx);
-  } else {
-    console.log("No memo found in transaction", txFromChainhook.transaction_identifier.hash);
   }
 
   return NextResponse.json(data, { status: 200 });
 }
 
-export async function GET(request: Request): Promise<NextResponse> {
+export async function GET(): Promise<NextResponse> {
   const events = await getSordEvents();
   return NextResponse.json(events, { status: 200 });
 }

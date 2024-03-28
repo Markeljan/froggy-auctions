@@ -31,7 +31,5 @@ export async function readContract({ contractAddress, contractName, functionName
 
   const convertedResultVal = fnCall.result && cvToValue(hexToCV(fnCall.result))?.value?.value;
 
-  console.log(`readContract: ${contractName}.${functionName}(${functionArgs}) => ${convertedResultVal}`);
-
   return convertedResultVal || null;
 }

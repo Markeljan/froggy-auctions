@@ -28,7 +28,6 @@ export const Froggys = ({ onChange }: { onChange: (value: string) => void }) => 
     if (sordEvents?.length > 0) {
       const latestEvent = sordEvents[0];
       if (latestEvent?.txId !== lastShownTxId && lastShownTxId !== null) {
-        console.log("New sOrdinals event", latestEvent?.sender, latestEvent?.recipient, latestEvent?.memo);
         toast(
           <div>
             <p>New sOrdinals event</p>
@@ -72,7 +71,6 @@ export const Froggys = ({ onChange }: { onChange: (value: string) => void }) => 
         data?.map((froggy: FroggyHopWithIdAndOwner, index: number) => {
           const { id: tokenId } = findFroggy(Number(froggy.id)) || {};
           const isHopping = froggy?.hopStatus === HopStatus.HOPPING || froggy?.hopStatus === HopStatus.HOPPING_BACK;
-          console.log("froggy owner", froggy.owner, FROGGY_AGENT_ADDRESS);
           return (
             <ImageCard
               onClick={() => {

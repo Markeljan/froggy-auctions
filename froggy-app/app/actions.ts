@@ -1,12 +1,10 @@
 import { kv } from "@vercel/kv";
 import { FroggyHop, HopStatus, TxStatus } from "@/lib/types";
-import { FROGGY_AGENT_ADDRESS } from "./config";
 
 export async function addFroggyHop(data: FroggyHop): Promise<Boolean> {
   const { txId, txStatus, hopStatus, tokenId } = data;
   // override check for txId
   data.txId = txId.startsWith("0x") ? txId : `0x${txId}`;
-  console.log("addFroggyHop data:", data);
   if (!txId || !txStatus || !hopStatus || !tokenId) {
     console.error("Missing required data for froggy hop transaction");
     return false;

@@ -45,7 +45,6 @@ export const Hop = () => {
   const { data } = useFroggysQuery({ inscriptionId: inscriptionId }) as {
     data: SordinalsFroggyData & { hopStatus: HopStatus };
   };
-  console.log("data", data);
   const { data: readTokenOwner } = useReadContract({
     contractAddress: FROGGY_CONTRACT_ADDRESS,
     contractName: "froggys",
@@ -53,17 +52,10 @@ export const Hop = () => {
     functionArgs: [tokenId],
     enabled: !!tokenId,
   });
-  console.log("readTokenOwner", readTokenOwner);
   const froggyImage = `/frogs/${tokenId || 1}.png`;
   const isHopping = data?.hopStatus === HopStatus.HOPPING || data?.hopStatus === HopStatus.HOPPING_BACK;
   const isHopDisabled = isHopping ? true : !!data?.owner ? data?.owner !== userAddress : true;
   const isHopBackDisabled = isHopping ? true : !!readTokenOwner ? readTokenOwner !== userAddress : true;
-
-  console.log("readTokenOwner", readTokenOwner);
-
-  console.log("isHopDisabled", isHopDisabled);
-  console.log("isHopBackDisabled", isHopBackDisabled);
-  console.log("isHopping", isHopping);
 
   const handleHop = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -87,10 +79,8 @@ export const Hop = () => {
         return;
       },
       onFinish: async (result) => {
-        console.log("STX Transfer result:", result.txId);
         // send hop data to the agent
         await postHop({ txId: result.txId });
-        console.log("Hop result:", result);
 
         toast(
           <div className="flex flex-col space-x-2 items-center">
@@ -148,7 +138,6 @@ export const Hop = () => {
             icon: "✅",
           }
         );
-        console.log("Hop Back result:", result);
         setHopTxId(result.txId);
       },
     });
