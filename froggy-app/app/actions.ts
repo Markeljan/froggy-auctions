@@ -155,10 +155,6 @@ const hop: FroggyHop = {
 // const hop = await getFroggyHopByTxId("0x03a49f5409c2d6a7fc1cd541cedce08dd602c90a5e8dcc75bbbc72686970576e");
 // console.log("hop", hop);
 
-const res = await addFroggyHop(hop);
-
-console.log("res", res);
-
 //const res = hop && (await updateFroggyHop({ ...hop, hopStatus: HopStatus.HOPPING }));
 
 //console.log("res", res);
