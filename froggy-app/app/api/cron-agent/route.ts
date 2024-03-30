@@ -36,9 +36,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
   // get all pending txs
   const dbPendingTxs = await getPendingFroggyTxs();
-  if (dbPendingTxs.length === 0) {
-    return NextResponse.json({ message: "No pending hops to execute" }, { status: 200 });
-  }
 
   const nonce = await getNonce(FROGGY_AGENT_ADDRESS, network);
   const executedTxIds: string[] = [];
@@ -53,6 +50,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   // filter successful transactions
   const successfulTransactions = liveTransactions.filter((tx) => tx.tx_status === "success");
+
+  if (successfulTransactions.length === 0) {
+    return NextResponse.json({ message: "No successful transactions to process" }, { status: 200 });
+  }
 
   successfulTransactions.forEach(async (tx) => {
     const matchingTx = dbTxById.get(tx.tx_id);
@@ -178,7 +179,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   });
 
   if (executedTxIds.length === 0) {
-    return NextResponse.json({ message: "No hops executed" }, { status: 200 });
+    return NextResponse.json({ message: `Possibles errors or invalid Froggy transactions` }, { status: 569 });
   }
 
   return NextResponse.json({ message: "Hops executed", executedTxIds }, { status: 200 });
