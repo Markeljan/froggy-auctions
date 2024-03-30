@@ -55,11 +55,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ message: "No successful transactions to process" }, { status: 200 });
   }
 
-  successfulTransactions.forEach(async (tx) => {
+  for (const tx of successfulTransactions) {
     const matchingTx = dbTxById.get(tx.tx_id);
     if (!matchingTx) {
       console.error(`No matching tx found for txId: ${tx.tx_id}`);
-      return;
+      continue;
     }
     // handle HOPPING transactions
     if (matchingTx.hopStatus === HopStatus.HOPPING) {
@@ -67,30 +67,30 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       const contractFunctionName = tx?.contract_call?.function_name;
       if (contractAddress !== SORDINALS_CONTRACT_ADDRESS || contractFunctionName !== "transfer-memo-single") {
         console.error(`h Invalid contract address or function name: ${contractAddress} ${contractFunctionName}`);
-        return;
+        continue;
       }
       const sender = tx.sender_address;
       const recipient = tx?.contract_call?.function_args[0]?.repr.split("'")[1];
       if (recipient !== FROGGY_AGENT_ADDRESS || !sender) {
         console.error("Invalid sender or recipient");
-        return;
+        continue;
       }
       const memo = tx?.contract_call?.function_args[1]?.repr;
       if (!memo?.startsWith(TRANSFER_PREFIX)) {
         console.error("Invalid memo");
-        return;
+        continue;
       }
       const inscriptionHashFromMemo = memo.slice(TRANSFER_PREFIX.length);
       const { inscriptionId, id: tokenId } = findFroggy(inscriptionHashFromMemo) || {};
       if (!inscriptionId || !tokenId) {
         console.error("Invalid inscriptionId or tokenId");
-        return;
+        continue;
       }
       const agentFroggys = await getOwnedFroggysByPrinciple(FROGGY_AGENT_ADDRESS);
       const isFroggyHeldByAgent = agentFroggys?.some((sord: { id: string }) => sord.id === inscriptionId.toString());
       if (!isFroggyHeldByAgent) {
         console.error(`Froggy inscription not held by agent: ${inscriptionId}`);
-        return;
+        continue;
       }
 
       const tokenIdHolder = await getFroggyTokenOwner(tokenId);
@@ -128,14 +128,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       const contractFunctionName = tx?.contract_call?.function_name;
       if (contractAddress !== FROGGY_CONTRACT_ADDRESS || contractFunctionName !== "hop-back") {
         console.error(`h-b Invalid contract address or function name: ${contractAddress} ${contractFunctionName}`);
-        return false;
+        continue;
       }
       // get the tokenId from the tx function args
       const tokenId = parseInt(tx?.contract_call?.function_args[0]?.repr.split("u")[1]);
       const { inscriptionId, inscriptionHash } = findFroggy(tokenId) || {};
       if (!inscriptionHash || !inscriptionId) {
         console.error(`Invalid inscriptionId or inscriptionHash: ${inscriptionId} ${inscriptionHash}`);
-        return false;
+        continue;
       }
       // validate that the sender owns the hopped froggy
       const tokenIdHolder = await getFroggyTokenOwner(tokenId);
@@ -143,7 +143,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       const sender = tx.sender_address;
       if (tokenIdHolder !== sender) {
         console.error(`Token holder does not match sender: ${tokenIdHolder} !== ${sender}`);
-        return false;
+        continue;
       }
 
       // validate that the agent owns the froggy inscription
@@ -151,7 +151,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       const isFroggyHeldByAgent = agentFroggys?.some((sord: { id: string }) => sord.id === inscriptionId.toString());
       if (!isFroggyHeldByAgent) {
         console.error(`Froggy inscription not held by agent: ${inscriptionId}`);
-        return false;
+        continue;
       }
       const memoString = Buffer.from("t").toString("hex") + inscriptionHash;
       const txOptions: SignedContractCallOptions = {
@@ -176,10 +176,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     if (matchingTx.hopStatus === HopStatus.HOPPED || matchingTx.hopStatus === HopStatus.NONE) {
       await updateFroggyHop({ ...matchingTx, txStatus: TxStatus.SUCCESS });
     }
-  });
+  }
 
   if (executedTxIds.length === 0) {
-    return NextResponse.json({ message: `Possibles errors or invalid Froggy transactions` }, { status: 500 });
+    return NextResponse.json({ message: `Possibles errors or invalid Froggy transactions` }, { status: 569 });
   }
 
   return NextResponse.json({ message: "Hops executed", executedTxIds }, { status: 200 });
