@@ -179,7 +179,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   });
 
   if (executedTxIds.length === 0) {
-    return NextResponse.json({ message: `Possibles errors or invalid Froggy transactions` }, { status: 569 });
+    return NextResponse.json({ message: `Possibles errors or invalid Froggy transactions` }, { status: 500 });
   }
 
   return NextResponse.json({ message: "Hops executed", executedTxIds }, { status: 200 });
