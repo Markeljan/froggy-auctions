@@ -18,6 +18,7 @@ import {
   FROGGY_AGENT_ADDRESS,
   FROGGY_AGENT_KEY,
   FROGGY_CONTRACT_ADDRESS,
+  FROGGY_CONTRACT_ID,
   SORDINALS_CONTRACT_ADDRESS,
   TRANSFER_PREFIX,
   network,
@@ -94,7 +95,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       }
 
       const tokenIdHolder = await getFroggyTokenOwner(tokenId);
-      const isTokenIdVaulted = tokenIdHolder === `${FROGGY_CONTRACT_ADDRESS}.froggys`;
+      const isTokenIdVaulted = tokenIdHolder === FROGGY_CONTRACT_ID;
 
       const contractSendsNFTPostCondition = createNonFungiblePostCondition(
         FROGGY_CONTRACT_ADDRESS,
@@ -141,7 +142,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       const tokenIdHolder = await getFroggyTokenOwner(tokenId);
 
       const sender = tx.sender_address;
-      if (tokenIdHolder !== sender) {
+      // validate that the contract now holds the froggy
+      if (tokenIdHolder !== FROGGY_CONTRACT_ID) {
         console.error(`Token holder does not match sender: ${tokenIdHolder} !== ${sender}`);
         continue;
       }
