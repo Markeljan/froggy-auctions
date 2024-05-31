@@ -78,7 +78,7 @@ export const Froggys = ({ onChange }: { onChange: (value: string) => void }) => 
               }}
               className={cn("max-w-[150px] w-full mx-auto cursor-pointer", {
                 "bg-green-400": isHopping,
-                "bg-orange-400": froggy.owner === FROGGY_AGENT_ADDRESS,
+                "bg-orange-400": froggy?.owner === FROGGY_AGENT_ADDRESS,
               })}
               imageUrl={`/frogs/${tokenId}.png`}
               key={index}
